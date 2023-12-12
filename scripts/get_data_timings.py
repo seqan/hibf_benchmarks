@@ -17,19 +17,19 @@
 import os
 import csv
 
-input_path = "/Users/leoxnard/Documents/JupiterNotebooks/data/query.timings"
-output_directory = "/Users/leoxnard/Documents/JupiterNotebooks/timings"
+from shared import input_timings, output_timings
+
 keys = ['k', 'alpha', 'hash', 'r-fpr', 'none', 'U+R', 'U']
 repeat = 3
 
 try:
-    os.mkdir(output_directory)
-    print("Directory %s created" % output_directory)
+    os.makedirs(output_timings, exist_ok=True)
+    print("Directory %s created" % output_timings)
 except OSError:
-    print("files replaced in directory %s" % output_directory)
+    print("files replaced in directory %s" % output_timings)
 
 for key in keys:
-    output_path = f'{output_directory}/{key}.csv'
+    output_path = f'{output_timings}/{key}.csv'
     subkeys = []
     wall_clock_time_in_seconds = []
     query_ibf_avg_per_thread_in_seconds = []
@@ -39,7 +39,7 @@ for key in keys:
     determine_query_length_in_seconds = []
     query_file_io_in_seconds = []
 
-    with open(input_path, "r") as file:
+    with open(input_timings, "r") as file:
         reader = csv.reader(file, delimiter='\t')
         i = 0
         wall_clock_time_in_seconds_i = 0
@@ -69,12 +69,12 @@ for key in keys:
                     determine_query_length_in_seconds.append(round((determine_query_length_in_seconds_i / repeat), 2))
                     query_file_io_in_seconds.append(round((query_file_io_in_seconds_i / repeat), 2))
                     wall_clock_time_in_seconds.append(round(max(0,(
-                                                                    wall_clock_time_in_seconds_i - 
-                                                                    query_ibf_avg_per_thread_in_seconds_i - 
-                                                                    load_index_in_seconds_i - 
-                                                                    generate_results_avg_per_thread_in_seconds_i - 
-                                                                    compute_minimiser_avg_per_thread_in_seconds_i - 
-                                                                    determine_query_length_in_seconds_i - 
+                                                                    wall_clock_time_in_seconds_i -
+                                                                    query_ibf_avg_per_thread_in_seconds_i -
+                                                                    load_index_in_seconds_i -
+                                                                    generate_results_avg_per_thread_in_seconds_i -
+                                                                    compute_minimiser_avg_per_thread_in_seconds_i -
+                                                                    determine_query_length_in_seconds_i -
                                                                     query_file_io_in_seconds_i
                                                                 )) / repeat, 2))
                     wall_clock_time_in_seconds_i = 0
@@ -85,7 +85,7 @@ for key in keys:
                     determine_query_length_in_seconds_i = 0
                     query_file_io_in_seconds_i = 0
                     i = 0
-                    
+
 
     subkeys, wall_clock_time_in_seconds, query_ibf_avg_per_thread_in_seconds, load_index_in_seconds, generate_results_avg_per_thread_in_seconds, compute_minimiser_avg_per_thread_in_seconds, determine_query_length_in_seconds, query_file_io_in_seconds = zip(*sorted(zip(subkeys, wall_clock_time_in_seconds, query_ibf_avg_per_thread_in_seconds, load_index_in_seconds, generate_results_avg_per_thread_in_seconds, compute_minimiser_avg_per_thread_in_seconds, determine_query_length_in_seconds, query_file_io_in_seconds)))
 

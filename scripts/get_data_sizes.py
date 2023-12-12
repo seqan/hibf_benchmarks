@@ -15,23 +15,23 @@
 import os
 import csv
 
-input_path = "/Users/leoxnard/Documents/JupiterNotebooks/data/all.sizes"
-output_directory = "/Users/leoxnard/Documents/JupiterNotebooks/sizes"
+from shared import input_sizes, output_sizes
+
 keys = ['k', 'alpha', 'hash', 'r-fpr', 'none', 'U+R', 'U']
 repeat = 3
 
 try:
-    os.mkdir(output_directory)
-    print("Directory %s created" % output_directory)
+    os.makedirs(output_sizes, exist_ok=True)
+    print("Directory %s created" % output_sizes)
 except OSError:
-    print("files replaced in directory %s" % output_directory)
+    print("files replaced in directory %s" % output_sizes)
 
 for key in keys:
-    output_path = f'{output_directory}/{key}.csv'
+    output_path = f'{output_sizes}/{key}.csv'
     subkeys = []
     bit_size_levels = [[] for _ in range(4)]
     avg_load_factor_levels = [[] for _ in range(4)]
-    with open(input_path, "r") as file:
+    with open(input_sizes, "r") as file:
         reader = csv.reader(file, delimiter='\t')
         expected_level_counter = 0
         for line in reader:
