@@ -4,7 +4,6 @@
 import csv
 import os
 
-import jinja2
 from bokeh import events
 from bokeh.io import output_notebook
 from bokeh.layouts import row
@@ -23,27 +22,6 @@ from bokeh.palettes import Set2_4, Set2_7
 from bokeh.plotting import curdoc, figure, output_file, save, show
 
 from shared import html_file, output_sizes, output_timings
-
-template = jinja2.Template(
-    """
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <style>
-            body { background: #15191c; }
-            div { max-height: 95vh; max-width: 100vw; }
-        </style>
-        <meta charset="utf-8">
-        {{ bokeh_css }}
-        {{ bokeh_js }}
-    </head>
-    <body>
-        {{ plot_div|indent(8) }}
-        {{ plot_script|indent(8) }}
-    </body>
-</html>
-"""
-)
 
 time_structure = [
     "subkeys",
@@ -294,7 +272,11 @@ def create_plot(interactive=False):
                 background-color: #7B7D7E;
             }
             """
-        save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[tab_style]), template=template)
+        global_style = """
+            body { background: #15191c; }
+            div { max-height: 96vh; max-width: 100vw; }
+        """
+        save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[tab_style, global_style]))
 
 
 if __name__ == "__main__":
