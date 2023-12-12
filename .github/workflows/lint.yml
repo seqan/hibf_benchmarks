@@ -1,0 +1,43 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+
+concurrency:
+  group: lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+env:
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eeuxo pipefail {0}
+
+jobs:
+  lint:
+    name: "${{ matrix.tool }}"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [black, isort, pylint]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install ${{ matrix.tool }}
+        run: pip install ${{ matrix.tool }} bokeh
+
+      - name: Run ${{ matrix.tool }}
+        run: ${{ matrix.tool }} ${{ matrix.tool == 'pylint' && '.' || '--check --diff .' }}
+
