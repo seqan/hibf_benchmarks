@@ -4,13 +4,46 @@
 import csv
 import os
 
+import jinja2
+from bokeh import events
 from bokeh.io import output_notebook
 from bokeh.layouts import row
-from bokeh.models import AdaptiveTicker, CustomJSTickFormatter, FactorRange, HoverTool, LinearAxis, TabPanel, Tabs
+from bokeh.models import (
+    AdaptiveTicker,
+    CustomJS,
+    CustomJSTickFormatter,
+    FactorRange,
+    HoverTool,
+    Legend,
+    LinearAxis,
+    TabPanel,
+    Tabs,
+)
 from bokeh.palettes import Set2_4, Set2_7
-from bokeh.plotting import figure, output_file, save, show
+from bokeh.plotting import curdoc, figure, output_file, save, show
 
 from shared import html_file, output_sizes, output_timings
+
+template = jinja2.Template(
+    """
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            body { background: #15191c; }
+            div { max-height: 95vh; max-width: 100vw; }
+        </style>
+        <meta charset="utf-8">
+        {{ bokeh_css }}
+        {{ bokeh_js }}
+    </head>
+    <body>
+        {{ plot_div|indent(8) }}
+        {{ plot_script|indent(8) }}
+    </body>
+</html>
+"""
+)
 
 time_structure = [
     "subkeys",
@@ -96,7 +129,8 @@ def mix_with_white(color, alpha):
 
 def create_plot(interactive=False):
     """Creates the plot."""
-    output_file(filename=html_file, title="Static HTML file")
+    output_file(filename=html_file, title="HIBF Benchmarks")
+    curdoc().theme = "dark_minimal"
     if interactive:
         output_notebook()
     tabs = []
@@ -114,28 +148,23 @@ def create_plot(interactive=False):
             time_data, size_data = convert_time_data(time_data_list, file_name), convert_size_data(
                 size_data_list[:5], file_name
             )
-            max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.8), get_max_result(
-                size_data_list[1:], 1.8
+            max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.01), get_max_result(
+                size_data_list[1:], 1.01
             )
             p1 = figure(
                 y_range=convert_list_to_string(size_data[time_structure[0]]),
-                height=500,
-                width=800,
                 x_range=(max_result_time, 0),
                 x_axis_label="time in minutes",
                 toolbar_location="left",
                 tools="",
             )
             renderers1 = p1.hbar_stack(
-                stackers=time_structure[1:],
-                y=time_structure[0],
-                height=0.4,
-                source=(time_data),
-                color=Set2_7,
-                legend_label=time_structure[1:],
+                stackers=time_structure[1:], y=time_structure[0], height=0.4, source=(time_data), color=Set2_7
             )
+            legend_items = []
             for r in renderers1:
                 key, tag = r.name, r.name
+                legend_items.append((key, [r]))
                 if key == "wall_clock_time_in_seconds":
                     tag = "time_left"
                 p1.add_tools(
@@ -157,7 +186,7 @@ def create_plot(interactive=False):
             }
             zweite_y_achse = LinearAxis(y_range_name="zusätzliche_achse")
             zweite_y_achse.major_label_text_font_size = "1pt"
-            zweite_y_achse.major_label_text_color = "#ffffff"
+            zweite_y_achse.major_label_text_color = "#15191c"
             p1.add_layout(zweite_y_achse, "right")
             p1.xaxis.ticker = AdaptiveTicker(base=60, mantissas=[1, 2, 5], min_interval=60, max_interval=600)
             p1.xaxis.formatter = CustomJSTickFormatter(
@@ -168,35 +197,46 @@ def create_plot(interactive=False):
             p1.y_range.range_padding = 0.1
             p1.ygrid.grid_line_color = None
             p1.axis.minor_tick_line_color = None
-            p1.legend.location = "top_left"
-            p1.legend.label_text_font_size = "10pt"
-            p1.legend.glyph_height = 12
-            p1.legend.glyph_width = 12
-            p1.legend.border_line_width = 2
-            p1.legend.title = "Standard parameters:\n\t\t\tt_max = 192\n\t\tunion estimation (U) = yes\n\t\t\trearrangement (R) = yes\n\t\t\tk-mer size (k) = 32\n\t\t\tnumber of hash function (hash) = 2\n\t\t\talpha = 1.2\n\t\t\trelaxed false positive rate (r-fpr) = 0.5\n\t\t\tmaximum false positive rate (fpr) = 0.05"
-            p1.legend.title_text_font_size = "10pt"
+
             p1.yaxis.major_tick_line_color = None
             p1.yaxis.minor_tick_line_color = None
             p1.outline_line_color = None
+            p1.sizing_mode = "scale_both"
+            p1.title.text = "Double click on legend/plot to hide/show the legend"
+            p1.title.align = "right"
+
+            legend = Legend(items=legend_items)
+            legend.location = "center"
+            legend.orientation = "vertical"
+            legend.glyph_height = 12
+            legend.glyph_width = 12
+            legend.click_policy = "mute"
+            # legend.nrows = 3
+            legend.title = "Default parameters:\n\t\t\tt_max = 192\n\t\tunion estimation (U) = yes\n\t\t\trearrangement (R) = yes\n\t\t\tk-mer size (k) = 32\n\t\t\tnumber of hash function (hash) = 2\n\t\t\talpha = 1.2\n\t\t\trelaxed false positive rate (r-fpr) = 0.5\n\t\t\tmaximum false positive rate (fpr) = 0.05"
+            legend.title_text_color = "#e0e0e0"
+            p1.add_layout(legend, "left")
+            toggle_legend_js = CustomJS(
+                args={"legend": legend},
+                code="""
+                    legend.visible = !legend.visible
+            """,
+            )
+            p1.js_on_event(events.DoubleTap, toggle_legend_js)
+
             p2 = figure(
                 y_range=convert_list_to_string(size_data[size_structure[0]]),
-                height=500,
-                width=400,
                 x_range=(0, max_result_size),
                 x_axis_label="size in GB",
                 toolbar_location="right",
                 tools="",
             )
+            legend_items = []
             renderers2 = p2.hbar_stack(
-                size_structure[1:],
-                y=size_structure[0],
-                height=0.4,
-                source=(size_data),
-                color=Set2_4,
-                legend_label=size_structure[1:],
+                size_structure[1:], y=size_structure[0], height=0.4, source=(size_data), color=Set2_4
             )
             for r in renderers2:
                 key = r.name
+                legend_items.append((key, [r]))
                 p2.add_tools(
                     HoverTool(
                         tooltips=[
@@ -214,16 +254,47 @@ def create_plot(interactive=False):
             p2.ygrid.grid_line_color = None
             p2.axis.minor_tick_line_color = None
             p2.outline_line_color = None
-            p2.legend.location = "top_right"
+            p2.title.text = "Click on legend entries to mute the corresponding bars"
+
+            legend = Legend(items=legend_items)
+            legend.location = "center"
+            legend.glyph_height = 12
+            legend.glyph_width = 12
+            legend.click_policy = "mute"
+            p2.add_layout(legend, "right")
+            toggle_legend_js = CustomJS(
+                args={"legend": legend},
+                code="""
+                    legend.visible = !legend.visible
+            """,
+            )
+            p2.js_on_event(events.DoubleTap, toggle_legend_js)
+
             p2.yaxis.major_tick_line_color = None
             p2.yaxis.minor_tick_line_color = None
             p2.yaxis.major_label_standoff = 15
+            p2.sizing_mode = "scale_both"
             both_plots = row(p1, p2)
+            both_plots.sizing_mode = "scale_both"
             tabs.append(TabPanel(child=both_plots, title=files_names_titles[i]))
     if interactive:
-        show(Tabs(tabs=tabs))
+        show(Tabs(tabs=tabs, sizing_mode="scale_both"))
     else:
-        save(Tabs(tabs=tabs))
+        tab_style = """
+            :host(.bk-Tabs) {
+            background-color: #15191c;
+            }
+
+            :host(.bk-Tabs) .bk-header {
+            color: #e0e0e0;
+            border-bottom: 1px solid #9c9c9c;
+            }
+
+            .bk-tab:hover {
+                background-color: #7B7D7E;
+            }
+            """
+        save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[tab_style]), template=template)
 
 
 if __name__ == "__main__":
