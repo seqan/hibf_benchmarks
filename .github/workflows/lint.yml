@@ -35,8 +35,8 @@ jobs:
           python-version: '3.x'
           cache: 'pip'
 
-      - name: Install ${{ matrix.tool }}
-        run: pip install ${{ matrix.tool }} bokeh
+      - name: Install dependencies
+        run: pip install --requirement requirements.txt
 
       - name: Run ${{ matrix.tool }}
         run: ${{ matrix.tool }} ${{ matrix.tool == 'pylint' && '.' || '--check --diff .' }}
