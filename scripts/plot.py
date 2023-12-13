@@ -60,9 +60,7 @@ def convert_time_data(data, key):
     export["all_times"] = [sum(float(i) for i in sublist) for sublist in zip(*data[1:])]
     for i, element in enumerate(data[1:]):
         export[time_structure[i + 1]] = convert_list_to_float(element)
-        export[f"{time_structure[i+1]}_percentage"] = [
-            round((float(i) / export["all_times"][0]) * 100, 2) for i in export[time_structure[i + 1]]
-        ]
+        export[f"{time_structure[i+1]}_percentage"] = devide_arrays_in_percentage(export[time_structure[i+1]], export["all_times"])
     return export
 
 
@@ -72,11 +70,11 @@ def convert_size_data(data, key):
     export[size_structure[0]] = [f"{key} = {value}" for value in data[0]]
     export["value"] = data[0]
     export["sizes"] = [sum(float(i) for i in sublist) for sublist in zip(*data[1:])]
-    for i, element in enumerate(data[1:]):
+    for i, element in enumerate(data[1:5]):
         export[size_structure[i + 1]] = convert_list_to_float(element)
-        export[f"{size_structure[i+1]}_percentage"] = [
-            round((float(i) / export["sizes"][0]) * 100, 2) for i in export[size_structure[i + 1]]
-        ]
+        export[f"{size_structure[i+1]}_percentage"] = devide_arrays_in_percentage(export[size_structure[i+1]], export["sizes"])
+    for i, element in enumerate(data[5:]):
+        export[f"{size_structure[i+1]}_avg_load_factor"] = element
     return export
 
 
@@ -90,19 +88,9 @@ def get_max_result(data, factor):
     return round(max(add_arrays(data)) * factor)
 
 
-def hex_to_rgb(hex_code):
-    """Returns the rgb values of the given hex code."""
-    hex_code = hex_code.lstrip("#")
-    return tuple(int(hex_code[i : i + 2], 16) for i in (0, 2, 4))
-
-
-def mix_with_white(color, alpha):
-    """Simulates applying the given alpha value to the given color."""
-    white = (255, 255, 255)
-    r = (1 - alpha) * color[0] + alpha * white[0]
-    g = (1 - alpha) * color[1] + alpha * white[1]
-    b = (1 - alpha) * color[2] + alpha * white[2]
-    return (int(r), int(g), int(b))
+def devide_arrays_in_percentage(list1, list2):
+    """Returns the percentage of each element from list1 to list2."""
+    return [round(float(i) / float(j) * 100, 2) for i, j in zip(list1, list2)]
 
 
 def create_plot(interactive=False):
@@ -123,12 +111,8 @@ def create_plot(interactive=False):
                 file_name = "t_max"
             time_reader, size_reader = csv.reader(timing_file), csv.reader(size_file)
             time_data_list, size_data_list = list(time_reader), list(size_reader)
-            time_data, size_data = convert_time_data(time_data_list, file_name), convert_size_data(
-                size_data_list[:5], file_name
-            )
-            max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.01), get_max_result(
-                size_data_list[1:], 1.01
-            )
+            time_data, size_data = convert_time_data(time_data_list, file_name), convert_size_data(size_data_list, file_name)
+            max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.01), get_max_result(size_data_list[1:], 1.01)
             p1 = figure(
                 y_range=convert_list_to_string(size_data[time_structure[0]]),
                 x_range=(max_result_time, 0),
@@ -222,6 +206,7 @@ def create_plot(interactive=False):
                             ("all_level_size", "@sizes{0.00}GB"),
                             (key, "@$name{0.00}GB"),
                             ("Percentage", f"@{key}_percentage{{0.00}}%"),
+                            ("avg_load_factor", f"@{key}_avg_load_factor{{0.00}}"),
                         ],
                         renderers=[r],
                     )
