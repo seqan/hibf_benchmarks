@@ -60,7 +60,9 @@ def convert_time_data(data, key):
     export["all_times"] = [sum(float(i) for i in sublist) for sublist in zip(*data[1:])]
     for i, element in enumerate(data[1:]):
         export[time_structure[i + 1]] = convert_list_to_float(element)
-        export[f"{time_structure[i+1]}_percentage"] = devide_arrays_in_percentage(export[time_structure[i+1]], export["all_times"])
+        export[f"{time_structure[i+1]}_percentage"] = devide_arrays_in_percentage(
+            export[time_structure[i + 1]], export["all_times"]
+        )
     return export
 
 
@@ -72,7 +74,9 @@ def convert_size_data(data, key):
     export["sizes"] = [sum(float(i) for i in sublist) for sublist in zip(*data[1:])]
     for i, element in enumerate(data[1:5]):
         export[size_structure[i + 1]] = convert_list_to_float(element)
-        export[f"{size_structure[i+1]}_percentage"] = devide_arrays_in_percentage(export[size_structure[i+1]], export["sizes"])
+        export[f"{size_structure[i+1]}_percentage"] = devide_arrays_in_percentage(
+            export[size_structure[i + 1]], export["sizes"]
+        )
     for i, element in enumerate(data[5:]):
         export[f"{size_structure[i+1]}_avg_load_factor"] = element
     return export
@@ -111,8 +115,12 @@ def create_plot(interactive=False):
                 file_name = "t_max"
             time_reader, size_reader = csv.reader(timing_file), csv.reader(size_file)
             time_data_list, size_data_list = list(time_reader), list(size_reader)
-            time_data, size_data = convert_time_data(time_data_list, file_name), convert_size_data(size_data_list, file_name)
-            max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.01), get_max_result(size_data_list[1:], 1.01)
+            time_data, size_data = convert_time_data(time_data_list, file_name), convert_size_data(
+                size_data_list, file_name
+            )
+            max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.01), get_max_result(
+                size_data_list[1:], 1.01
+            )
             p1 = figure(
                 y_range=convert_list_to_string(size_data[time_structure[0]]),
                 x_range=(max_result_time, 0),
