@@ -129,7 +129,9 @@ def create_timing_csv():
                 )
             )
         )
-        query_ibf_avg_per_thread_in_seconds = [round(x + y, 2) for x, y in zip(query_ibf_avg_per_thread_in_seconds, time_left)]
+        query_ibf_avg_per_thread_in_seconds = [
+            round(x + y, 2) for x, y in zip(query_ibf_avg_per_thread_in_seconds, time_left)
+        ]
         all_lists = [
             subkeys,
             query_file_io_in_seconds,
