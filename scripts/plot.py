@@ -18,7 +18,7 @@ from bokeh.models import (
     TabPanel,
     Tabs,
 )
-from bokeh.palettes import Set2_4, Set2_7
+from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save, show
 
 from shared import html_file, output_sizes, output_timings
@@ -31,7 +31,6 @@ time_structure = [
     "generate_results_avg_per_thread_in_seconds",
     "load_index_in_seconds",
     "query_ibf_avg_per_thread_in_seconds",
-    "wall_clock_time_in_seconds",
 ]
 size_structure = [
     "subkeys",
@@ -129,7 +128,7 @@ def create_plot(interactive=False):
                 tools="",
             )
             renderers1 = p1.hbar_stack(
-                stackers=time_structure[1:], y=time_structure[0], height=0.4, source=(time_data), color=Set2_7
+                stackers=time_structure[1:], y=time_structure[0], height=0.4, source=(time_data), color=Set2_6
             )
             legend_items = []
             for r in renderers1:

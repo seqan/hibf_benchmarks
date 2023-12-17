@@ -9,13 +9,12 @@
 
 ## OUTPUT:
 # [Subkeys]
-# [Wall Clock Time]
-# [Query IBF Avg Per Thread]
-# [Load Index]
-# [Generate Results Avg Per Thread]
-# [Compute Minimiser Avg Per Thread]
-# [Determine Query Length]
 # [Query File IO]
+# [Determine Query Length]
+# [Compute Minimiser Avg Per Thread]
+# [Generate Results Avg Per Thread]
+# [Load Index]
+# [Query IBF Avg Per Thread (including time left))]
 
 import csv
 import os
@@ -35,7 +34,7 @@ def create_timing_csv():
     for key in keys:
         output_path = f"{output_timings}/{key}.csv"
         subkeys = []
-        wall_clock_time_in_seconds = []
+        time_left = []
         query_ibf_avg_per_thread_in_seconds = []
         load_index_in_seconds = []
         generate_results_avg_per_thread_in_seconds = []
@@ -81,7 +80,7 @@ def create_timing_csv():
                             round((determine_query_length_in_seconds_i / repeat), 2)
                         )
                         query_file_io_in_seconds.append(round((query_file_io_in_seconds_i / repeat), 2))
-                        wall_clock_time_in_seconds.append(
+                        time_left.append(
                             round(
                                 max(
                                     0,
@@ -109,7 +108,7 @@ def create_timing_csv():
                         i = 0
         (
             subkeys,
-            wall_clock_time_in_seconds,
+            time_left,
             query_ibf_avg_per_thread_in_seconds,
             load_index_in_seconds,
             generate_results_avg_per_thread_in_seconds,
@@ -120,7 +119,7 @@ def create_timing_csv():
             *sorted(
                 zip(
                     subkeys,
-                    wall_clock_time_in_seconds,
+                    time_left,
                     query_ibf_avg_per_thread_in_seconds,
                     load_index_in_seconds,
                     generate_results_avg_per_thread_in_seconds,
@@ -130,6 +129,7 @@ def create_timing_csv():
                 )
             )
         )
+        query_ibf_avg_per_thread_in_seconds = [round(x + y, 2) for x, y in zip(query_ibf_avg_per_thread_in_seconds, time_left)]
         all_lists = [
             subkeys,
             query_file_io_in_seconds,
@@ -138,7 +138,6 @@ def create_timing_csv():
             generate_results_avg_per_thread_in_seconds,
             load_index_in_seconds,
             query_ibf_avg_per_thread_in_seconds,
-            wall_clock_time_in_seconds,
         ]
         write_csvs(output_path, all_lists)
 
