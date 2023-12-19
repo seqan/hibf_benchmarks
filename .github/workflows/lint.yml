@@ -1,12 +1,11 @@
 name: Lint
 
 on:
-  pull_request:
-  push:
+  pull_request_target:
 
 concurrency:
-  group: lint-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name != 'push' }}
+  group: lint-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 env:
   TZ: Europe/Berlin
@@ -16,15 +15,58 @@ defaults:
     shell: bash -Eeuxo pipefail {0}
 
 jobs:
-  lint:
-    name: "${{ matrix.tool }}"
+  auto-lint:
+    name: Formatting
     runs-on: ubuntu-22.04
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        tool: [black, isort, pylint]
+    outputs:
+      has_changes: ${{ steps.commit.outputs.committed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install --requirement requirements.txt
+
+      - name: Run isort
+        run: isort .
+
+      - name: Run black
+        run: black .
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+          passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Commit changes
+        id: commit
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: .
+          author_name: seqan-actions[bot]
+          author_email: seqan-actions@users.noreply.github.com
+          message: '[MISC] automatic linting'
+
+  lint:
+    needs: auto-lint
+    if: needs.auto-lint.outputs.has_changes == 'false'
+    name: Style Guide
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,6 +80,6 @@ jobs:
       - name: Install dependencies
         run: pip install --requirement requirements.txt
 
-      - name: Run ${{ matrix.tool }}
-        run: ${{ matrix.tool }} ${{ matrix.tool == 'pylint' && '.' || '--check --diff .' }}
+      - name: Run pylint
+        run: pylint .
 
