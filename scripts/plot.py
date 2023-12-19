@@ -21,7 +21,7 @@ from bokeh.models import (
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save, show
 
-from shared import html_file, output_sizes, output_timings
+from shared import html_dir, html_file, output_sizes, output_timings
 
 time_structure = [
     "subkeys",
@@ -98,6 +98,11 @@ def devide_arrays_in_percentage(list1, list2):
 
 def create_plot(interactive=False):
     """Creates the plot."""
+    try:
+        os.makedirs(html_dir, exist_ok=True)
+        print(f"Directory {html_dir} created")
+    except OSError:
+        print("files replaced in directory {html_dir}")
     output_file(filename=html_file, title="HIBF Benchmarks")
     curdoc().theme = "dark_minimal"
     if interactive:
