@@ -9,6 +9,8 @@ from bokeh.io import output_notebook
 from bokeh.layouts import column, row
 from bokeh.models import (
     AdaptiveTicker,
+    CheckboxGroup,
+    ColumnDataSource,
     CustomJS,
     CustomJSTickFormatter,
     Div,
@@ -133,8 +135,12 @@ def create_plot(interactive=False):
                 toolbar_location="left",
                 tools="",
             )
+
+            source = ColumnDataSource(time_data)
+            original = ColumnDataSource(time_data)
+
             renderers1 = p1.hbar_stack(
-                stackers=time_structure[1:], y=time_structure[0], height=0.4, source=(time_data), color=Set2_6
+                stackers=time_structure[1:], y=time_structure[0], height=0.4, source=source, color=Set2_6
             )
             legend_items = []
             for r in renderers1:
@@ -198,6 +204,32 @@ def create_plot(interactive=False):
             )
             p1.js_on_event(events.DoubleTap, toggle_legend_js)
 
+            chkbxgrp = CheckboxGroup(labels=time_structure[1:], active=list(range(len(time_structure[1:]))))
+            callback = CustomJS(
+                args={"source": source, "original": original},
+                code="""
+                var active_values = cb_obj.active.map(x => cb_obj.labels[x]);
+                var number_of_entries = cb_obj.labels.length;
+
+                for (var i = 0; i < number_of_entries; i++)
+                {
+                    var value = cb_obj.labels[i];
+                    if (active_values.indexOf(value) >= 0)
+                    {
+                        source.data[value] = original.data[value];
+                    }
+                    else
+                    {
+                        delete source.data[value];
+                    }
+                }
+
+                source.change.emit();
+                console.log("callback completed");
+                """,
+            )
+            chkbxgrp.js_on_change("active", callback)
+
             p2 = figure(
                 y_range=convert_list_to_string(size_data[size_structure[0]]),
                 x_range=(0, max_result_size),
@@ -250,7 +282,7 @@ def create_plot(interactive=False):
             p2.yaxis.minor_tick_line_color = None
             p2.yaxis.major_label_standoff = 15
             p2.sizing_mode = "scale_both"
-            both_plots = row(p1, p2)
+            both_plots = row(chkbxgrp, p1, p2)
             both_plots.sizing_mode = "scale_both"
             vercel_logo = """
                 <svg width="209" height="40" viewBox="0 0 209 40" fill="none" xmlns="http://www.w3.org/2000/svg">
