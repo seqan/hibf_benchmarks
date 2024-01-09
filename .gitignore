@@ -11,6 +11,10 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+data/all.fastq
+data/raptor
+data/data_set
+scripts/.snakemake/
 downloads/
 eggs/
 .eggs/

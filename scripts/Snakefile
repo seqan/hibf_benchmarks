@@ -1,0 +1,174 @@
+
+configfile: "parameters.yaml"
+
+rule all:
+	input:
+		f'{config['OUTPUT_DIR']}/all.sizes',
+		f'{config['OUTPUT_DIR']}/all.timings'
+	threads:
+		config["NUM_THREADS"]
+
+
+rule check_output_dir:
+	output:
+		temp(touch('output_checked'))
+	params:
+		OUTPUT_DIR = config["OUTPUT_DIR"]
+	shell:
+		"""
+		if ! [[ -d {params.OUTPUT_DIR} ]]; then
+			echo "Directory {params.OUTPUT_DIR} does not exist. Exiting."
+		fi
+		touch {output}
+		"""
+
+
+rule check_raptor_binary:
+	output:
+		temp(touch('raptor_binary_checked'))
+	params:
+		RAPTOR_BINARY = config["RAPTOR_BINARY"]
+	shell:
+		"""
+		if ! [[ -s {params.RAPTOR_BINARY} ]]; then
+			echo "Executable {params.RAPTOR_BINARY} does not exist. Exiting."
+			exit 1
+		fi
+		if ! {params.RAPTOR_BINARY} --help &> /dev/null; then
+			echo "Executable {params.RAPTOR_BINARY} cannot be run. Exiting."
+			exit 1
+		fi
+		touch {output}
+		"""
+
+
+rule check_input_files:
+	output:
+		temp(touch('input_file_checked'))
+	params:
+		INPUT_DIR = config["INPUT_DIR"],
+		QUERY_ERRORS = config["DEFAULT_PARAMS"]["QUERY_ERRORS"],
+		QUERY_LENGTH = config["DEFAULT_PARAMS"]["QUERY_LENGTH"]
+	shell:
+		"""
+		if ! [[ -s {params.INPUT_DIR}/filenames ]]; then
+			echo "Input file {params.INPUT_DIR}/filenames does not exist. Exiting."
+			exit 1
+		fi
+		if ! [[ -s {params.INPUT_DIR}/reads_e{params.QUERY_ERRORS}_{params.QUERY_LENGTH}/all.fastq ]]; then
+			echo "Input file {params.INPUT_DIR}/reads_e{params.QUERY_ERRORS}_{params.QUERY_LENGTH}/all.fastq does not exist. Exiting."
+			exit 1
+		fi
+		touch {output}
+		"""
+
+rule raptor_layout:
+	output:
+		LAYOUT_FILE = 'build/{key}={param}/layout'
+	threads:
+		config["NUM_THREADS"]
+	params:
+		RAPTOR_BINARY = config["RAPTOR_BINARY"],
+		INPUT_DIR = config["INPUT_DIR"],
+		LAYOUT_FILE = 'build/{key}={param}/layout',
+		LAYOUT_TIME = 'build/{key}={param}/layout.time',
+		KMER_SIZE = config["DEFAULT_PARAMS"]["KMER_SIZE"],
+		NUM_HASHES = config["DEFAULT_PARAMS"]["NUM_HASHES"],
+		RELAXED_FPR = config["DEFAULT_PARAMS"]["R_FPR"],
+		MAXIMUM_FPR = config["DEFAULT_PARAMS"]["M_FPR"],
+	shell:
+		"""
+		echo "[$(date +"%Y-%m-%d %T")] Running raptor layout."
+		# Raptor layout doesn't provide `--timing-output`, so we use /usr/bin/time with a custom format
+		/usr/bin/time -o {params.LAYOUT_TIME} -f "wall_clock_time_in_seconds\tpeak_memory_usage_in_kibibytes\n%e\t%M" \
+		{params.RAPTOR_BINARY} layout
+			--input {params.INPUT_DIR}/filenames \
+			--output {params.LAYOUT_FILE} \
+			--kmer {params.KMER_SIZE} \
+			--fpr {params.MAXIMUM_FPR} \
+			--relaxed-fpr {params.RELAXED_FPR} \
+			--hash {params.NUM_HASHES} \
+			--disable-estimate-union \
+			--disable-rearrangement \
+			--threads {threads}
+		"""
+
+
+rule raptor_build:
+	input:
+		'build/{key}={param}/layout'
+	output:
+		'build/{key}={param}/index'
+	threads:
+		config["NUM_THREADS"]
+	params:
+		RAPTOR_BINARY = config["RAPTOR_BINARY"],
+		LAYOUT_FILE = 'build/{key}={param}/layout',
+		INDEX_FILE = 'build/{key}={param}/index',
+		INDEX_TIME = 'build/{key}={param}/index.time',
+		WINDOW_SIZE = config["DEFAULT_PARAMS"]["WINDOW_SIZE"],
+	shell:
+		"""
+		echo "[$(date +"%Y-%m-%d %T")] Running raptor build."
+		{params.RAPTOR_BINARY} build
+			--input {params.LAYOUT_FILE} \
+			--output {params.INDEX_FILE} \
+			--window {params.WINDOW_SIZE} \
+			--quiet \
+			--timing-output {params.INDEX_TIME} \
+			--threads {threads}
+		"""
+
+
+rule raptor_search:
+	input:
+		"raptor_binary_checked",
+		"output_checked",
+		"input_file_checked",
+		'build/{key}={param}/index'
+	output:
+		'build/{key}={param}/out'
+	threads:
+		config["NUM_THREADS"]
+	params:
+		RAPTOR_BINARY = config["RAPTOR_BINARY"],
+		INPUT_DIR = config["INPUT_DIR"],
+		INDEX_FILE = 'build/{key}={param}/index',
+		RESULT_FILE = 'build/{key}={param}/out',
+		RESULT_TIME = 'build/{key}={param}/out.time',
+		QUERY_LENGTH = config["DEFAULT_PARAMS"]["QUERY_LENGTH"],
+		QUERY_ERRORS = config["DEFAULT_PARAMS"]["QUERY_ERRORS"],
+	shell:
+		"""
+		echo "[$(date +"%Y-%m-%d %T")] Running raptor search."
+		{params.RAPTOR_BINARY} search
+			--index {params.INDEX_FILE} \
+			--query {params.INPUT_DIR}/reads_e{params.QUERY_ERRORS}_{params.QUERY_LENGTH}/all.fastq \
+			--output {params.RESULT_FILE} \
+			--error {params.QUERY_ERRORS} \
+			--query_length {params.QUERY_LENGTH} \
+			--quiet \
+			--timing-output {params.RESULT_TIME} \
+			--threads {threads}
+		"""
+
+
+rule store_timings:
+	input:
+		expand('build/{param}/out',
+			param = [f"alpha={str(param).replace('.', '-')}" for param in config["PARAMS"]["ALPHA"]] +
+					[f"t_max={param}" for param in config["PARAMS"]["T_MAX"]] +
+					[f"hashes={param}" for param in config["PARAMS"]["NUM_HASHES"]] +
+					[f"kmer={param}" for param in config["PARAMS"]["KMER_SIZE"]] +
+					[f"r_fpr={str(param).replace('.', '-')}" for param in config["PARAMS"]["RELAXED_FPR"]])
+	output:
+		f"{config['OUTPUT_DIR']}/all.timings"
+	threads:
+		config["NUM_THREADS"]
+	shell:
+		"""
+		echo "[$(date +"%Y-%m-%d %T")] Storing timings."
+		touch {output}
+		# python summerize_timings {input} > {output}
+		"""
+
