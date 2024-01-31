@@ -12,7 +12,7 @@ env:
 
 defaults:
   run:
-    shell: bash -Eexuo pipefail {0}
+    shell: bash -el {0}
 
 jobs:
   build-html:
@@ -23,14 +23,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Cache conda
+        uses: actions/cache@v4
         with:
-          python-version: '3.x'
-          cache: 'pip'
+          path: ~/conda_pkgs_dir
+          save-always: true
+          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
 
-      - name: Install dependencies
-        run: pip install --requirement requirements.txt
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: false
+          activate-environment: snakemake
+          environment-file: environment.yml
+          auto-activate-base: false
+          use-only-tar-bz2: true
 
       - name: Build HTML
         run:  python3 scripts/main.py
