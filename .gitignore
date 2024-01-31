@@ -14,7 +14,7 @@ develop-eggs/
 dist/
 data/all.fastq
 data/raptor
-data/data_set
+data/1024
 scripts/.snakemake/
 downloads/
 eggs/

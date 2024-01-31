@@ -34,10 +34,8 @@ args <- commandArgs(trailingOnly = TRUE)
 
 data_list <- list()
 
-print(args[1])
 SELECTED_FORMAT <- TIME_FORMAT
-if (grepl("size", args[1])) {
-	print("SIZE")
+if (any(sapply(args, function(x) grepl("size", x)))) {
 	SELECTED_FORMAT <- SIZE_FORMAT
 }
 

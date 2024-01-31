@@ -11,25 +11,31 @@ rule all:
 rule check_output_dir:
 	output:
 		temp(touch('output_checked'))
+	log:
+		"log/check_paths.log"
 	params:
 		OUTPUT_DIR = config["OUTPUT_DIR"]
 	shell:
 		"""
-		if ! [[ -d {params.OUTPUT_DIR} ]]; then
+		(if ! [[ -d {params.OUTPUT_DIR} ]]; then
 			echo "Directory {params.OUTPUT_DIR} does not exist. Exiting."
 			exit 1
-		fi
+		fi 
+		echo "[$(date +"%Y-%m-%d %T")] Output directory {params.OUTPUT_DIR} exists."
+		) &>> {log}
 		"""
 
 
 rule check_raptor_binary:
 	output:
 		temp(touch('raptor_binary_checked'))
+	log:
+		"log/check_paths.log"
 	params:
 		RAPTOR_BINARY = config["RAPTOR_BINARY"]
 	shell:
 		"""
-		if ! [[ -s {params.RAPTOR_BINARY} ]]; then
+		(if ! [[ -s {params.RAPTOR_BINARY} ]]; then
 			echo "Executable {params.RAPTOR_BINARY} does not exist. Exiting."
 			exit 1
 		fi
@@ -37,18 +43,22 @@ rule check_raptor_binary:
 			echo "Executable {params.RAPTOR_BINARY} cannot be run. Exiting."
 			exit 1
 		fi
+		echo "[$(date +"%Y-%m-%d %T")] Raptor binary {params.RAPTOR_BINARY} looks good." 
+		) &>> {log}
 		"""
 
 
 rule check_input_files:
 	output:
 		temp(touch('input_file_checked'))
+	log:
+		"log/check_paths.log"
 	params:
 		FILENAMES_FILE=config['FILENAMES_FILE'],
 		QUERY_FILE=config['QUERY_FILE'],
 	shell:
 		"""
-		if ! [[ -s {params.FILENAMES_FILE} ]]; then
+		(if ! [[ -s {params.FILENAMES_FILE} ]]; then
 			echo "Filenames file {params.FILENAMES_FILE} does not exist or is empty. Exiting."
 			exit 1
 		fi
@@ -56,6 +66,8 @@ rule check_input_files:
 			echo "Query file {params.QUERY_FILE} does not exist or is empty. Exiting."
 			exit 1
 		fi
+		echo "[$(date +"%Y-%m-%d %T")] Input files look good."
+		) &>> {log}
 		"""
 
 
@@ -63,11 +75,13 @@ rule check_input_files:
 rule display_layout_binary_check:
 	output:
 		temp(touch('display_layout_binary_checked'))
+	log:
+		"log/check_paths.log"
 	params:
 		DISPLAY_LAYOUT_BINARY = config["DISPLAY_LAYOUT_BINARY"]
 	shell:
 		"""
-		if ! [[ -s {params.DISPLAY_LAYOUT_BINARY} ]]; then
+		(if ! [[ -s {params.DISPLAY_LAYOUT_BINARY} ]]; then
 			echo "Executable {params.DISPLAY_LAYOUT_BINARY} does not exist. Exiting."
 			exit 1
 		fi
@@ -76,6 +90,8 @@ rule display_layout_binary_check:
 			echo "Executable {params.DISPLAY_LAYOUT_BINARY} cannot be run. Exiting."
 			exit 1
 		fi
+		echo "[$(date +"%Y-%m-%d %T")] Display layout binary {params.DISPLAY_LAYOUT_BINARY} looks good."
+		) &>> {log}
 		"""
 
 rule raptor_layout:
@@ -83,15 +99,15 @@ rule raptor_layout:
 		"raptor_binary_checked",
 		"input_file_checked",
 	output:
-		'build/{key}={param}/layout'
-		'build/{key}={param}/layout.time'
+		LAYOUT_FILE = 'build/{key}={param}/layout',
+		LAYOUT_TIME = 'build/{key}={param}/layout.time'
 	threads:
 		config["NUM_THREADS"]
+	log:
+		"log/raptor_layout_{key}_{param}.log"
 	params:
 		RAPTOR_BINARY = config["RAPTOR_BINARY"],
-		FILENAMES_FILE = f"{config['FILENAMES_FILE']}",
-		LAYOUT_FILE = 'build/{key}={param}/layout',
-		LAYOUT_TIME = 'build/{key}={param}/layout.time',
+		FILENAMES_FILE = config['FILENAMES_FILE'],
 		KMER = config["DEFAULT_PARAMS"]["KMER_SIZE"],
 		WINDOW_SIZE = config["DEFAULT_PARAMS"]["WINDOW_SIZE"],
 		T_MAX = config["DEFAULT_PARAMS"]["T_MAX"],
@@ -101,7 +117,7 @@ rule raptor_layout:
 		ALPHA = config["DEFAULT_PARAMS"]["ALPHA"],
 	shell:
 		"""
-		kmer=$([[ {wildcards.key} == "kmer" ]] && echo {wildcards.param} || echo {params.KMER})
+		(kmer=$([[ {wildcards.key} == "kmer" ]] && echo {wildcards.param} || echo {params.KMER})
 		tmax=$([[ {wildcards.key} == "tmax" ]] && echo {wildcards.param} || echo {params.T_MAX})
 		hash=$([[ {wildcards.key} == "hash" ]] && echo {wildcards.param} || echo {params.NUM_HASHES})
 		relaxed_fpr=$([[ {wildcards.key} == "r-relaxed" ]] && echo {wildcards.param} | sed 's/_/./g' || echo {params.R_FPR})
@@ -109,7 +125,7 @@ rule raptor_layout:
 		echo "[$(date +"%Y-%m-%d %T")] Running raptor layout for {wildcards.key}={wildcards.param}."
 		{params.RAPTOR_BINARY} layout \
 			--input {params.FILENAMES_FILE} \
-			--output {params.LAYOUT_FILE} \
+			--output {output.LAYOUT_FILE} \
 			--kmer $kmer \
 			--window {params.WINDOW_SIZE} \
 			--tmax $tmax \
@@ -121,36 +137,37 @@ rule raptor_layout:
 			--alpha $alpha \
 			--max-rearrangement-ratio 0.5 \
 			--sketch-bits 12 \
-			--timing-output {params.LAYOUT_TIME} \
+			--timing-output {output.LAYOUT_TIME} \
 			--threads {threads}
+		) &>> {log}
 		"""
 
 
 rule raptor_build:
 	input:
 		"raptor_binary_checked",
-		'build/{key}={param}/layout'
+		LAYOUT_FILE = 'build/{key}={param}/layout'
 	output:
-		'build/{key}={param}/index'
-		'build/{key}={param}/index.time'
+		INDEX_FILE = 'build/{key}={param}/index',
+		INDEX_TIME = 'build/{key}={param}/index.time'
 	threads:
 		config["NUM_THREADS"]
+	log:
+		"log/raptor_build_{key}_{param}.log"
 	params:
 		RAPTOR_BINARY = config["RAPTOR_BINARY"],
 		WINDOW_SIZE = config["DEFAULT_PARAMS"]["WINDOW_SIZE"],
-		LAYOUT_FILE = 'build/{key}={param}/layout',
-		INDEX_FILE = 'build/{key}={param}/index',
-		INDEX_TIME = 'build/{key}={param}/index.time',
 	shell:
 		"""
-		echo "[$(date +"%Y-%m-%d %T")] Running raptor build for {wildcards.key}={wildcards.param}."
+		(echo "[$(date +"%Y-%m-%d %T")] Running raptor build for {wildcards.key}={wildcards.param}."
 		{params.RAPTOR_BINARY} build \
-			--input {params.LAYOUT_FILE} \
-			--output {params.INDEX_FILE} \
+			--input {input.LAYOUT_FILE} \
+			--output {output.INDEX_FILE} \
 			--window {params.WINDOW_SIZE} \
 			--quiet \
-			--timing-output {params.INDEX_TIME} \
+			--timing-output {output.INDEX_TIME} \
 			--threads {threads}
+		) &>> {log}
 		"""
 
 
@@ -158,55 +175,56 @@ rule raptor_search:
 	input:
 		"raptor_binary_checked",
 		"input_file_checked",
-		'build/{key}={param}/index'
+		INDEX_FILE = 'build/{key}={param}/index'
 	output:
-		'build/{key}={param}/out',
-		'build/{key}={param}/out.time'
+		RESULT_FILE = 'build/{key}={param}/out',
+		RESULT_TIME = 'build/{key}={param}/out.time'
 	threads:
 		config["NUM_THREADS"]
+	log:
+		"log/raptor_search_{key}_{param}.log"
 	params:
 		RAPTOR_BINARY = config["RAPTOR_BINARY"],
-		QUERY_FILE = "/srv/public/leonard/hibf_benchmarks/data/data_set/reads_e2_250/all.fastq",
+		QUERY_FILE = config["QUERY_FILE"],
 		QUERY_ERRORS = config["DATA_PARAMETERS"]["QUERY_ERRORS"],
 		QUERY_LENGTH = config["DATA_PARAMETERS"]["QUERY_LENGTH"],
-		INDEX_FILE = 'build/{key}={param}/index',
-		RESULT_FILE = 'build/{key}={param}/out',
-		RESULT_TIME = 'build/{key}={param}/out.time',
 	shell:
 		"""
-		echo "[$(date +"%Y-%m-%d %T")] Running raptor search for {wildcards.key}={wildcards.param}."
+		(echo "[$(date +"%Y-%m-%d %T")] Running raptor search for {wildcards.key}={wildcards.param}."
 		{params.RAPTOR_BINARY} search \
-			--index {params.INDEX_FILE} \
+			--index {input.INDEX_FILE} \
 			--query {params.QUERY_FILE} \
-			--output {params.RESULT_FILE} \
+			--output {output.RESULT_FILE} \
 			--error {params.QUERY_ERRORS} \
 			--query_length {params.QUERY_LENGTH} \
 			--quiet \
-			--timing-output {params.RESULT_TIME} \
+			--timing-output {output.RESULT_TIME} \
 			--threads {threads}
+		) &>> {log}
 		"""
 
 
 rule display_layout:
 	input:
 		"display_layout_binary_checked",
-		'build/{key}={param}/out'
+		LAYOUT_FILE = 'build/{key}={param}/layout'
 	output:
-		"build/{key}={param}/sizes"
+		SIZE_FILE = "build/{key}={param}/sizes"
 	threads:
 		config["NUM_THREADS"]
+	log:
+		"log/display_layout_{key}_{param}.log"
 	params:
 		DISPLAY_LAYOUT_BINARY = config["DISPLAY_LAYOUT_BINARY"],
-		LAYOUT_FILE = 'build/{key}={param}/layout',
-		SIZE_FILE = 'build/{key}={param}/sizes',
 		WINDOW_SIZE = config["DEFAULT_PARAMS"]["WINDOW_SIZE"],
 	shell:
 		"""
-		echo "[$(date +"%Y-%m-%d %T")] Running display_layout for {wildcards.key}={wildcards.param}."
+		(echo "[$(date +"%Y-%m-%d %T")] Running display_layout for {wildcards.key}={wildcards.param}."
 		{params.DISPLAY_LAYOUT_BINARY} sizes \
-			--input {params.LAYOUT_FILE} \
-			--output {params.SIZE_FILE} \
+			--input {input.LAYOUT_FILE} \
+			--output {output.SIZE_FILE} \
 			--threads {threads}
+		) &>> {log}
 		"""	
 
 
@@ -223,10 +241,13 @@ rule store_timings:
 		f"{config['OUTPUT_DIR']}/{config['OUTPUT_TIME_NAME']}"
 	threads:
 		config["NUM_THREADS"]
+	log:
+		"log/store_timings.log"
 	shell:
 		"""
-		echo "[$(date +"%Y-%m-%d %T")] Storing timings."
+		(echo "[$(date +"%Y-%m-%d %T")] Storing timings."
 		Rscript summarize_results.r {output} {input.files}
+		) &>> {log}
 		"""
 
 
@@ -243,8 +264,11 @@ rule store_sizes:
 		f"{config['OUTPUT_DIR']}/{config['OUTPUT_SIZE_NAME']}"
 	threads:
 		config["NUM_THREADS"]
+	log:
+		"log/store_sizes.log"
 	shell:
 		"""
-		echo "[$(date +"%Y-%m-%d %T")] Storing sizes."
+		(echo "[$(date +"%Y-%m-%d %T")] Storing sizes."
 		Rscript summarize_results.r {output} {input.files}
+		) &>> {log}
 		"""

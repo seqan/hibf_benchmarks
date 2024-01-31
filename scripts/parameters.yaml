@@ -2,15 +2,16 @@
 RAPTOR_BINARY: /srv/data/seiler/hibf_benchmark/raptor
 
 DISPLAY_LAYOUT_BINARY: /srv/data/seiler/hibf_benchmark/display_layout
-FILENAMES_FILE: /srv/public/leonard/hibf_benchmarks/data/data_set/8192.filenames
-QUERY_FILE: /srv/public/leonard/hibf_benchmarks/data/data_set/reads_e2_250/all.fastq
+FILENAMES_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/1024.filenames
+QUERY_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/reads_e2_250/all.fastq
 OUTPUT_DIR: /srv/public/leonard/hibf_benchmarks/output
 OUTPUT_TIME_NAME: time
 OUTPUT_SIZE_NAME: size
+LOG_DIR: logs/
 
 PARAMS:
   ALPHA: [1.0]
-  T_MAX: [64]
+  T_MAX: []
   NUM_HASHES: []
   KMER_SIZE: []
   RELAXED_FPR: []
