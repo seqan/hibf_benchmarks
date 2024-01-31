@@ -1,12 +1,11 @@
 name: snakemake
 channels:
   - conda-forge
-  - bioconda
   - defaults
 dependencies:
-  - black
-  - bokeh
-  - isort
-  - pylint
-  - snakemake
-  - snakefmt
+  - black=23.11.0
+  - bokeh=3.3.4
+  - isort=5.13.2
+  - pylint=3.0.3
+  - bioconda::snakemake=8.4.2
+  - bioconda::snakefmt=0.9.0

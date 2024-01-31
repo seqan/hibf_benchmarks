@@ -29,21 +29,15 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.SEQAN_ACTIONS_PAT }}
 
-      - name: Cache conda
-        uses: actions/cache@v4
-        with:
-          path: ~/conda_pkgs_dir
-          save-always: true
-          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
-
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: false
           activate-environment: snakemake
-          environment-file: environment.yml
           auto-activate-base: false
-          use-only-tar-bz2: true
+          auto-update-conda: false
+          channel-priority: strict
+          environment-file: environment.yml
+          miniforge-version: latest
 
       - name: Run isort
         run: isort .
@@ -84,21 +78,15 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Cache conda
-        uses: actions/cache@v4
-        with:
-          path: ~/conda_pkgs_dir
-          save-always: true
-          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
-
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: false
           activate-environment: snakemake
-          environment-file: environment.yml
           auto-activate-base: false
-          use-only-tar-bz2: true
+          auto-update-conda: false
+          channel-priority: strict
+          environment-file: environment.yml
+          miniforge-version: latest
 
       - name: Run pylint
         run: pylint .
