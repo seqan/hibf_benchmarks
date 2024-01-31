@@ -1,22 +1,30 @@
 configfile: "/srv/public/leonard/raptor/util/new/parameters.yaml"
 
+
 rule all:
     input:
-        expand(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_search',
-                                kmerSize=config["RAPTOR_CONFIG"]["KMER_SIZE"],
-                                windowSize=config["RAPTOR_CONFIG"]["WINDOW_SIZE"],
-                                maximumFPR=[str(fpr).replace('.', '-') for fpr in config["RAPTOR_CONFIG"]["MAXIMUM_FPR"]],
-                                relaxedFPR=[str(fpr).replace('.', '-') for fpr in config["RAPTOR_CONFIG"]["RELAXED_FPR"]],
-                                numHashes=config["RAPTOR_CONFIG"]["NUM_HASHES"],
-                                binCount=[2**exp for exp in range(config["BIN_COUNT_RANGE"]["MIN_EXPONENT"], config["BIN_COUNT_RANGE"]["MAX_EXPONENT"] + 1)])
-    threads:
-        config["RAPTOR_CONFIG"]["NUM_THREADS"]
+        expand(
+            f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_search',
+            kmerSize=config["RAPTOR_CONFIG"]["KMER_SIZE"],
+            windowSize=config["RAPTOR_CONFIG"]["WINDOW_SIZE"],
+            maximumFPR=[str(fpr).replace(".", "-") for fpr in config["RAPTOR_CONFIG"]["MAXIMUM_FPR"]],
+            relaxedFPR=[str(fpr).replace(".", "-") for fpr in config["RAPTOR_CONFIG"]["RELAXED_FPR"]],
+            numHashes=config["RAPTOR_CONFIG"]["NUM_HASHES"],
+            binCount=[
+                2**exp
+                for exp in range(
+                    config["BIN_COUNT_RANGE"]["MIN_EXPONENT"], config["BIN_COUNT_RANGE"]["MAX_EXPONENT"] + 1
+                )
+            ],
+        ),
+    threads: config["RAPTOR_CONFIG"]["NUM_THREADS"]
+
 
 rule check_output_dir:
     output:
-        temp(touch('output_checked'))
+        temp(touch("output_checked")),
     params:
-        OUTPUT_DIR = config["OUTPUT_DIR"]
+        OUTPUT_DIR=config["OUTPUT_DIR"],
     shell:
         """
         if ! [[ -d {params.OUTPUT_DIR} ]]; then
@@ -25,11 +33,12 @@ rule check_output_dir:
         touch {output}
         """
 
+
 rule check_raptor_binary:
     output:
-        temp(touch('raptor_binary_checked'))
+        temp(touch("raptor_binary_checked")),
     params:
-        RAPTOR_BINARY = config["RAPTOR_BINARY"]
+        RAPTOR_BINARY=config["RAPTOR_BINARY"],
     shell:
         """
         if ! [[ -s {params.RAPTOR_BINARY} ]]; then
@@ -43,13 +52,14 @@ rule check_raptor_binary:
         touch {output}
         """
 
+
 rule check_input_files:
     output:
-        temp(touch('input_file_{binCount}_checked'))
+        temp(touch("input_file_{binCount}_checked")),
     params:
-        INPUT_DIR = config["INPUT_DIR"],
-        QUERY_ERRORS = config["DEFAULT_READ_CONFIG"]["QUERY_ERRORS"],
-        QUERY_LENGTH = config["DEFAULT_READ_CONFIG"]["QUERY_LENGTH"]
+        INPUT_DIR=config["INPUT_DIR"],
+        QUERY_ERRORS=config["DEFAULT_READ_CONFIG"]["QUERY_ERRORS"],
+        QUERY_LENGTH=config["DEFAULT_READ_CONFIG"]["QUERY_LENGTH"],
     shell:
         """
         if ! [[ -s {params.INPUT_DIR}/{wildcards.binCount}.filenames ]]; then
@@ -63,16 +73,16 @@ rule check_input_files:
         touch {output}
         """
 
+
 rule raptor_layout:
     output:
-        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_layout'))
-    threads:
-        config["RAPTOR_CONFIG"]["NUM_THREADS"]
+        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_layout')),
+    threads: config["RAPTOR_CONFIG"]["NUM_THREADS"]
     params:
-        RAPTOR_BINARY = config["RAPTOR_BINARY"],
-        INPUT_DIR = config["INPUT_DIR"],
-        LAYOUT_FILE = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.layout',
-        LAYOUT_TIME = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.layout.time',
+        RAPTOR_BINARY=config["RAPTOR_BINARY"],
+        INPUT_DIR=config["INPUT_DIR"],
+        LAYOUT_FILE=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.layout',
+        LAYOUT_TIME=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.layout.time',
     shell:
         """
         echo "[$(date +"%Y-%m-%d %T")] Running raptor layout for {wildcards.binCount} bins."
@@ -91,18 +101,18 @@ rule raptor_layout:
                                 --threads {threads}
         """
 
+
 rule raptor_build_withLayout:
     input:
-        f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_layout'
+        f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_layout',
     output:
-        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_withLayout_build'))
-    threads:
-        config["RAPTOR_CONFIG"]["NUM_THREADS"]
+        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_withLayout_build')),
+    threads: config["RAPTOR_CONFIG"]["NUM_THREADS"]
     params:
-        RAPTOR_BINARY = config["RAPTOR_BINARY"],
-        LAYOUT_FILE = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.layout',
-        INDEX_FILE = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index',
-        INDEX_TIME = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index.time',
+        RAPTOR_BINARY=config["RAPTOR_BINARY"],
+        LAYOUT_FILE=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.layout',
+        INDEX_FILE=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index',
+        INDEX_TIME=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index.time',
     shell:
         """
         echo "[$(date +"%Y-%m-%d %T")] Running raptor build for {wildcards.binCount} bins with running Layout."
@@ -114,16 +124,16 @@ rule raptor_build_withLayout:
                                 --threads {threads}
         """
 
+
 rule raptor_build_withoutLayout:
     output:
-        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_noLayout_build'))
-    threads:
-        config["RAPTOR_CONFIG"]["NUM_THREADS"]
+        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_noLayout_build')),
+    threads: config["RAPTOR_CONFIG"]["NUM_THREADS"]
     params:
-        RAPTOR_BINARY = config["RAPTOR_BINARY"],
-        INPUT_DIR = config["INPUT_DIR"],
-        INDEX_FILE = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index',
-        INDEX_TIME = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index.time',
+        RAPTOR_BINARY=config["RAPTOR_BINARY"],
+        INPUT_DIR=config["INPUT_DIR"],
+        INDEX_FILE=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index',
+        INDEX_TIME=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index.time',
     shell:
         """
         echo "[$(date +"%Y-%m-%d %T")] Running raptor build for {wildcards.binCount} bins without running Layout."
@@ -135,24 +145,24 @@ rule raptor_build_withoutLayout:
                                 --threads {threads}
         """
 
+
 rule raptor_search:
     input:
         "raptor_binary_checked",
         "output_checked",
         "input_file_{binCount}_checked",
-        f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_{config["RAPTOR_CONFIG"]["LAYOUT"]}_build'
+        f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_{config["RAPTOR_CONFIG"]["LAYOUT"]}_build',
     output:
-        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_search'))
-    threads:
-        config["RAPTOR_CONFIG"]["NUM_THREADS"]
+        temp(touch(f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}_search')),
+    threads: config["RAPTOR_CONFIG"]["NUM_THREADS"]
     params:
-        RAPTOR_BINARY = config["RAPTOR_BINARY"],
-        INPUT_DIR = config["INPUT_DIR"],
-        INDEX_FILE = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index',
-        RESULT_FILE = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.out',
-        RESULT_TIME = f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.out.time',
-        QUERY_LENGTH = config["DEFAULT_READ_CONFIG"]["QUERY_LENGTH"],
-        QUERY_ERRORS = config["DEFAULT_READ_CONFIG"]["QUERY_ERRORS"],
+        RAPTOR_BINARY=config["RAPTOR_BINARY"],
+        INPUT_DIR=config["INPUT_DIR"],
+        INDEX_FILE=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index',
+        RESULT_FILE=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.out',
+        RESULT_TIME=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.out.time',
+        QUERY_LENGTH=config["DEFAULT_READ_CONFIG"]["QUERY_LENGTH"],
+        QUERY_ERRORS=config["DEFAULT_READ_CONFIG"]["QUERY_ERRORS"],
     shell:
         """
         echo "[$(date +"%Y-%m-%d %T")] Running raptor search for {wildcards.binCount} bins."
