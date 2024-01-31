@@ -126,23 +126,23 @@ def create_plot(interactive=False):
             max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.01), get_max_result(
                 size_data_list[1:], 1.01
             )
-            p1 = figure(
+            plot1 = figure(
                 y_range=convert_list_to_string(size_data[time_structure[0]]),
                 x_range=(max_result_time, 0),
                 x_axis_label="time in minutes",
                 toolbar_location="left",
                 tools="",
             )
-            renderers1 = p1.hbar_stack(
+            renderers1 = plot1.hbar_stack(
                 stackers=time_structure[1:], y=time_structure[0], height=0.4, source=(time_data), color=Set2_6
             )
             legend_items = []
-            for r in renderers1:
-                key, tag = r.name, r.name
-                legend_items.append((key, [r]))
+            for renderer in renderers1:
+                key, tag = renderer.name, renderer.name
+                legend_items.append((key, [renderer]))
                 if key == "wall_clock_time_in_seconds":
                     tag = "time_left"
-                p1.add_tools(
+                plot1.add_tools(
                     HoverTool(
                         tooltips=[
                             (f"{file_name}", "@value"),
@@ -150,35 +150,35 @@ def create_plot(interactive=False):
                             (tag, "@$name{0.00} sek"),
                             ("Percentage", f"@{key}_percentage{{0.00}}%"),
                         ],
-                        renderers=[r],
+                        renderers=[renderer],
                     )
                 )
-            p1.toolbar_location = None
-            p1.toolbar.logo = None
-            p1.yaxis.visible = False
-            p1.extra_y_ranges = {
+            plot1.toolbar_location = None
+            plot1.toolbar.logo = None
+            plot1.yaxis.visible = False
+            plot1.extra_y_ranges = {
                 "zusätzliche_achse": FactorRange(factors=convert_list_to_string(size_data[time_structure[0]]))
             }
             zweite_y_achse = LinearAxis(y_range_name="zusätzliche_achse")
             zweite_y_achse.major_label_text_font_size = "1pt"
             zweite_y_achse.major_label_text_color = "#15191c"
-            p1.add_layout(zweite_y_achse, "right")
-            p1.xaxis.ticker = AdaptiveTicker(base=60, mantissas=[1, 2, 5], min_interval=60, max_interval=600)
-            p1.xaxis.formatter = CustomJSTickFormatter(
+            plot1.add_layout(zweite_y_achse, "right")
+            plot1.xaxis.ticker = AdaptiveTicker(base=60, mantissas=[1, 2, 5], min_interval=60, max_interval=600)
+            plot1.xaxis.formatter = CustomJSTickFormatter(
                 code="""
                 return (tick / 60);
             """
             )
-            p1.y_range.range_padding = 0.1
-            p1.ygrid.grid_line_color = None
-            p1.axis.minor_tick_line_color = None
+            plot1.y_range.range_padding = 0.1
+            plot1.ygrid.grid_line_color = None
+            plot1.axis.minor_tick_line_color = None
 
-            p1.yaxis.major_tick_line_color = None
-            p1.yaxis.minor_tick_line_color = None
-            p1.outline_line_color = None
-            p1.sizing_mode = "scale_both"
-            p1.title.text = "Double click on legend/plot to hide/show the legend"
-            p1.title.align = "right"
+            plot1.yaxis.major_tick_line_color = None
+            plot1.yaxis.minor_tick_line_color = None
+            plot1.outline_line_color = None
+            plot1.sizing_mode = "scale_both"
+            plot1.title.text = "Double click on legend/plot to hide/show the legend"
+            plot1.title.align = "right"
 
             legend = Legend(items=legend_items)
             legend.location = "center"
@@ -189,16 +189,16 @@ def create_plot(interactive=False):
             # legend.nrows = 3
             legend.title = "Default parameters:\n\t\t\tt_max = 192\n\t\tunion estimation (U) = yes\n\t\t\trearrangement (R) = yes\n\t\t\tk-mer size (k) = 32\n\t\t\tnumber of hash function (hash) = 2\n\t\t\talpha = 1.2\n\t\t\trelaxed false positive rate (r-fpr) = 0.5\n\t\t\tmaximum false positive rate (fpr) = 0.05"
             legend.title_text_color = "#e0e0e0"
-            p1.add_layout(legend, "left")
+            plot1.add_layout(legend, "left")
             toggle_legend_js = CustomJS(
                 args={"legend": legend},
                 code="""
                     legend.visible = !legend.visible
             """,
             )
-            p1.js_on_event(events.DoubleTap, toggle_legend_js)
+            plot1.js_on_event(events.DoubleTap, toggle_legend_js)
 
-            p2 = figure(
+            plot2 = figure(
                 y_range=convert_list_to_string(size_data[size_structure[0]]),
                 x_range=(0, max_result_size),
                 x_axis_label="size in GB",
@@ -206,13 +206,13 @@ def create_plot(interactive=False):
                 tools="",
             )
             legend_items = []
-            renderers2 = p2.hbar_stack(
+            renderers2 = plot2.hbar_stack(
                 size_structure[1:], y=size_structure[0], height=0.4, source=(size_data), color=Set2_4
             )
-            for r in renderers2:
-                key = r.name
-                legend_items.append((key, [r]))
-                p2.add_tools(
+            for renderer in renderers2:
+                key = renderer.name
+                legend_items.append((key, [renderer]))
+                plot2.add_tools(
                     HoverTool(
                         tooltips=[
                             (f"{file_name}", "@value"),
@@ -221,36 +221,36 @@ def create_plot(interactive=False):
                             ("Percentage", f"@{key}_percentage{{0.00}}%"),
                             ("avg_load_factor", f"@{key}_avg_load_factor{{0.00}}"),
                         ],
-                        renderers=[r],
+                        renderers=[renderer],
                     )
                 )
-            p2.toolbar.logo = None
-            p2.toolbar_location = None
-            p2.y_range.range_padding = 0.1
-            p2.ygrid.grid_line_color = None
-            p2.axis.minor_tick_line_color = None
-            p2.outline_line_color = None
-            p2.title.text = "Click on legend entries to mute the corresponding bars"
+            plot2.toolbar.logo = None
+            plot2.toolbar_location = None
+            plot2.y_range.range_padding = 0.1
+            plot2.ygrid.grid_line_color = None
+            plot2.axis.minor_tick_line_color = None
+            plot2.outline_line_color = None
+            plot2.title.text = "Click on legend entries to mute the corresponding bars"
 
             legend = Legend(items=legend_items)
             legend.location = "center"
             legend.glyph_height = 12
             legend.glyph_width = 12
             legend.click_policy = "mute"
-            p2.add_layout(legend, "right")
+            plot2.add_layout(legend, "right")
             toggle_legend_js = CustomJS(
                 args={"legend": legend},
                 code="""
                     legend.visible = !legend.visible
             """,
             )
-            p2.js_on_event(events.DoubleTap, toggle_legend_js)
+            plot2.js_on_event(events.DoubleTap, toggle_legend_js)
 
-            p2.yaxis.major_tick_line_color = None
-            p2.yaxis.minor_tick_line_color = None
-            p2.yaxis.major_label_standoff = 15
-            p2.sizing_mode = "scale_both"
-            both_plots = row(p1, p2)
+            plot2.yaxis.major_tick_line_color = None
+            plot2.yaxis.minor_tick_line_color = None
+            plot2.yaxis.major_label_standoff = 15
+            plot2.sizing_mode = "scale_both"
+            both_plots = row(plot1, plot2)
             both_plots.sizing_mode = "scale_both"
             vercel_logo = """
                 <svg width="209" height="40" viewBox="0 0 209 40" fill="none" xmlns="http://www.w3.org/2000/svg">
