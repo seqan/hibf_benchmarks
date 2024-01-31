@@ -1,4 +1,0 @@
-black
-bokeh
-isort
-pylint
