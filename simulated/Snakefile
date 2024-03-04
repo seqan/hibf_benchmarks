@@ -1,4 +1,4 @@
-configfile: "/srv/public/leonard/raptor/util/new/parameters.yaml"
+configfile: "parameters.yaml"
 
 
 rule all:
@@ -85,7 +85,7 @@ rule raptor_layout:
         LAYOUT_TIME=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.layout.time',
     shell:
         """
-        echo "[$(date +"%Y-%m-%d %T")] Running raptor layout for {wildcards.binCount} bins."
+        echo "[$(date "+%Y-%m-%d %T")] Running raptor layout for {wildcards.binCount} bins."
         relaxed_fpr=$(echo "{wildcards.relaxedFPR}" | sed 's/-/./g')
         maximum_fpr=$(echo "{wildcards.maximumFPR}" | sed 's/-/./g')
         # Raptor layout doesn't provide `--timing-output`, so we use /usr/bin/time with a custom format
@@ -115,7 +115,7 @@ rule raptor_build_withLayout:
         INDEX_TIME=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index.time',
     shell:
         """
-        echo "[$(date +"%Y-%m-%d %T")] Running raptor build for {wildcards.binCount} bins with running Layout."
+        echo "[$(date "+%Y-%m-%d %T")] Running raptor build for {wildcards.binCount} bins with running Layout."
         {params.RAPTOR_BINARY} build  --input {params.LAYOUT_FILE} \
                                 --output {params.INDEX_FILE} \
                                 --window {wildcards.windowSize} \
@@ -136,7 +136,7 @@ rule raptor_build_withoutLayout:
         INDEX_TIME=f'{config["OUTPUT_DIR"]}/{config["DIRECTORY_STRUCTURE"]}.index.time',
     shell:
         """
-        echo "[$(date +"%Y-%m-%d %T")] Running raptor build for {wildcards.binCount} bins without running Layout."
+        echo "[$(date "+%Y-%m-%d %T")] Running raptor build for {wildcards.binCount} bins without running Layout."
         {params.RAPTOR_BINARY} build --input {params.INPUT_DIR}/{wildcards.binCount}.filenames \
                                 --output {params.INDEX_FILE} \
                                 --window {wildcards.windowSize} \
@@ -165,7 +165,7 @@ rule raptor_search:
         QUERY_ERRORS=config["DEFAULT_READ_CONFIG"]["QUERY_ERRORS"],
     shell:
         """
-        echo "[$(date +"%Y-%m-%d %T")] Running raptor search for {wildcards.binCount} bins."
+        echo "[$(date "+%Y-%m-%d %T")] Running raptor search for {wildcards.binCount} bins."
         {params.RAPTOR_BINARY} search --index {params.INDEX_FILE} \
                                 --query {params.INPUT_DIR}/{wildcards.binCount}/reads_e{params.QUERY_ERRORS}_{params.QUERY_LENGTH}/all.fastq \
                                 --output {params.RESULT_FILE} \

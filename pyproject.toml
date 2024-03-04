@@ -1,11 +1,12 @@
 [tool.black]
 line-length = 120
-include = 'scripts/'
+include = '(\.pyi?|\.ipynb)$'
 quiet = true
 
 [tool.isort]
 profile = "black"
-src_paths = ["scripts"]
+src_paths = ['(\.pyi?|\.ipynb)$']
+known_first_party = ["shared"]
 line_length = 120
 quiet = true
 

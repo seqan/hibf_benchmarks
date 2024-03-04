@@ -12,7 +12,7 @@ env:
 
 defaults:
   run:
-    shell: bash -Eexuo pipefail {0}
+    shell: bash -el {0}
 
 jobs:
   build-html:
@@ -23,14 +23,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: '3.x'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: pip install --requirement requirements.txt
+          activate-environment: snakemake
+          auto-activate-base: false
+          auto-update-conda: false
+          channel-priority: strict
+          environment-file: environment.yml
+          miniforge-version: latest
 
       - name: Build HTML
         run:  python3 scripts/main.py

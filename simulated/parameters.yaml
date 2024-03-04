@@ -1,7 +1,6 @@
 RAPTOR_BINARY: "/srv/public/leonard/raptor/build/bin/raptor"
 INPUT_DIR: "/srv/data/seiler/simulation"
 OUTPUT_DIR: "/srv/data/leonard/test_run"
-#DIRECTORY_STRUCTURE: "kmer_{kmerSize}_windowSize_{windowSize}_maximumFPR_{maximumFPR}_relaxedFPR_{relaxedFPR}_numHashes_{numHashes}_{binCount}"
 DIRECTORY_STRUCTURE: "kmer_{kmerSize}/windowSize_{windowSize}/maximumFPR_{maximumFPR}/relaxedFPR_{relaxedFPR}/numHashes_{numHashes}/{binCount}"
 
 RAPTOR_CONFIG:
