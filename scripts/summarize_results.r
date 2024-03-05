@@ -17,18 +17,18 @@ if (args[1] == "size_format") {
 }
 
 extract_part <- function(file) {
-  parts <- strsplit(sub("^.*/(.+)/(.+)", "\\1", file), "=")[[1]]
-  key <- parts[1]
-  value <- as.numeric(gsub("_", ".", parts[2], fixed = TRUE))
-  subkey <- paste(key, value, sep="=")
-  return(list(key, subkey))
+    parts <- strsplit(sub("^.*/(.+)/(.+)", "\\1", file), "=")[[1]]
+    key <- parts[1]
+    value <- as.numeric(gsub("_", ".", parts[2], fixed = TRUE))
+    subkey <- paste(key, value, sep = "=")
+    return(list(key, subkey))
 }
 
 search_pattern <- function(LAYOUT_FILE, pattern) {
-  file_content <- readLines(LAYOUT_FILE)
-  combined_pattern <- paste(pattern, "false", sep = ".*")
-  matches <- grepl(combined_pattern, file_content)
-  if (any(matches)) 1 else 0
+    file_content <- readLines(LAYOUT_FILE)
+    combined_pattern <- paste(pattern, "false", sep = ".*")
+    matches <- grepl(combined_pattern, file_content)
+    if (any(matches)) 1 else 0
 }
 
 get_key <- function(key) {

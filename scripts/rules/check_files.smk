@@ -1,9 +1,10 @@
 rule check_output_dir:
     output:
         (touch("output_checked")),
-    log: "log/check_paths.log",
+    log:
+        "log/check_paths.log",
     params:
-        OUTPUT_DIR=config['BUILD_DIR'],
+        OUTPUT_DIR=config["BUILD_DIR"],
     shell:
         """
         (if ! [[ -d {params.OUTPUT_DIR} ]]; then
@@ -18,7 +19,8 @@ rule check_output_dir:
 rule check_raptor_binary:
     output:
         (touch("raptor_binary_checked")),
-    log: "log/check_paths.log",
+    log:
+        "log/check_paths.log",
     params:
         RAPTOR_BINARY=config["RAPTOR_BINARY"],
     shell:
@@ -39,7 +41,8 @@ rule check_raptor_binary:
 rule check_input_files:
     output:
         (touch("input_file_checked")),
-    log: "log/check_paths.log",
+    log:
+        "log/check_paths.log",
     params:
         FILENAMES_FILE=config["FILENAMES_FILE"],
         QUERY_FILE=config["QUERY_FILE"],
@@ -61,7 +64,8 @@ rule check_input_files:
 rule display_layout_binary_check:
     output:
         (touch("display_layout_binary_checked")),
-    log: "log/check_paths.log",
+    log:
+        "log/check_paths.log",
     params:
         DISPLAY_LAYOUT_BINARY=config["DISPLAY_LAYOUT_BINARY"],
     shell:

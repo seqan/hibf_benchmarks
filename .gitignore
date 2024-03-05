@@ -8,13 +8,8 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-output/
-build/
 develop-eggs/
 dist/
-data/all.fastq
-data/raptor
-data/1024
 scripts/.snakemake/
 downloads/
 eggs/
@@ -30,6 +25,12 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+data/1024
+output/
+build/
+*_checked
+log/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -55,8 +56,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-*_checked
-log/
 
 # Translations
 *.mo

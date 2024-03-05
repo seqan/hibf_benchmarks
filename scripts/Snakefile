@@ -6,10 +6,6 @@ include: "rules/run_raptor.smk"
 include: "rules/summarize.smk"
 include: "rules/plot.smk"
 
-# rule all:
-#     input:
-#         expand(f"{config['BUILD_DIR']}/prepared_{{type}}/{{key}}", type=["time", "size"], key=["alpha", "hash", "kmer", "relaxed-fpr", "none", "U", "U+R"]),
-#     threads: config["NUM_THREADS"]
 
 rule all:
     input:
