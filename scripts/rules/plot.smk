@@ -1,6 +1,5 @@
 rule prepare_data_for_plot:
     input:
-        "output_checked",
         SIZE_FILE=f"{config['BUILD_DIR']}/size",
         TIME_FILE=f"{config['BUILD_DIR']}/time",
     output:
@@ -9,7 +8,6 @@ rule prepare_data_for_plot:
             format=["time", "size"],
             key=["alpha", "hash", "kmer", "relaxed-fpr", "none", "U", "U+R"],
         ),
-    threads: config["NUM_THREADS"]
     log:
         "log/prepare_data_for_plot.log",
     conda:
@@ -24,15 +22,13 @@ rule prepare_data_for_plot:
 
 rule plot_data:
     input:
-        "output_checked",
         expand(
             f"{config['BUILD_DIR']}/prepared_{{format}}/{{key}}",
             format=["time", "size"],
             key=["alpha", "hash", "kmer", "relaxed-fpr", "none", "U", "U+R"],
         ),
     output:
-        f"{config['BUILD_DIR']}/index.html",
-    threads: config["NUM_THREADS"]
+        f"{config['PLOT_DIR']}/index.html",
     log:
         "log/plot_data.log",
     conda:

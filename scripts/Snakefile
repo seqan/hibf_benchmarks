@@ -1,7 +1,5 @@
 configfile: "parameters.yaml"
 
-
-include: "rules/check_files.smk"
 include: "rules/run_raptor.smk"
 include: "rules/summarize.smk"
 include: "rules/plot.smk"
@@ -9,5 +7,4 @@ include: "rules/plot.smk"
 
 rule all:
     input:
-        f"{config['BUILD_DIR']}/index.html",
-    threads: config["NUM_THREADS"]
+        f"{config['PLOT_DIR']}/index.html",

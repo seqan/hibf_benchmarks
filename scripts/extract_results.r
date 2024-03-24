@@ -28,7 +28,7 @@ KEYS <- config$KEYS
 args <- commandArgs(trailingOnly = TRUE)
 
 transform_size <- function(df) {
-    df$BIT_SIZE <- df$BIT_SIZE / 8 / 1024^3
+    df$BIT_SIZE <- df$BIT_SIZE / 8 / 1000^3
     df$AVG_LOAD_FACTOR <- df$AVG_LOAD_FACTOR / 100
     df_vollständig <- expand.grid(SUBKEY = unique(df$SUBKEY), LEVEL = 0:3)
     df_vollständig <- merge(df_vollständig, df, by = c("SUBKEY", "LEVEL"), all.x = TRUE)

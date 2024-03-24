@@ -1,6 +1,5 @@
 rule store_timings:
     input:
-        "output_checked",
         files=expand(
             f"{config['BUILD_DIR']}/{{param}}/out.time",
             param=[f"alpha={str(param).replace('.', '_')}" for param in config["PARAMS"]["ALPHA"]]
@@ -15,7 +14,6 @@ rule store_timings:
         ),
     output:
         f"{config['BUILD_DIR']}/time",
-    threads: config["NUM_THREADS"]
     log:
         "log/store_timings.log",
     conda:
@@ -30,7 +28,6 @@ rule store_timings:
 
 rule store_sizes:
     input:
-        "output_checked",
         files=expand(
             f"{config['BUILD_DIR']}/{{param}}/out.sizes",
             param=[f"alpha={str(param).replace('.', '_')}" for param in config["PARAMS"]["ALPHA"]]
@@ -45,7 +42,6 @@ rule store_sizes:
         ),
     output:
         f"{config['BUILD_DIR']}/size",
-    threads: config["NUM_THREADS"]
     log:
         "log/store_sizes.log",
     conda:

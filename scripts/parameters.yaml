@@ -5,11 +5,12 @@ DISPLAY_LAYOUT_BINARY: /srv/data/seiler/hibf_benchmark/display_layout
 FILENAMES_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/1024.filenames
 QUERY_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/reads_e2_250/all.fastq
 BUILD_DIR: /srv/public/leonard/hibf_benchmarks/scripts/build
-PLOT_DIR: /srv/public/leonard/hibf_benchmarks/scripts/build
+PLOT_DIR: /srv/public/leonard/hibf_benchmarks/scripts
 
 # PARAMS:
-#   ALPHA: [1.0]
-#   T_MAX: [128]
+#   # ALPHA: [1.0]
+#   ALPHA: [60.0 ,40.0, 20.0, 10.0, 5.0, 2.0, 1.5, 1.3, 1.0, 0.7, 0.5]
+#   T_MAX: [64]
 #   NUM_HASHES: [3]
 #   KMER_SIZE: [30]
 #   RELAXED_FPR: [0.3]
@@ -34,9 +35,9 @@ DEFAULT_PARAMS:
   R_FPR: 0.5
   M_FPR: 0.05
   WINDOW_SIZE: 32
-  MODE: [none]
+  MODE: U+R
 
-NUM_THREADS: 32
+NUM_THREADS: 1 # Number of threads to use per task, not for parallel execution
 
 TIME_FORMAT:
   - "KEY"
