@@ -1,8 +1,8 @@
-#!/usr/bin/env python
 """Creates a plot."""
 
 import csv
 import os
+import yaml
 
 from bokeh import events
 from bokeh.io import output_notebook
@@ -22,23 +22,22 @@ from bokeh.models import (
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save, show
 
-from shared import html_dir, html_file, output_sizes, output_timings
 
-time_structure = [
-    "subkeys",
-    "query_file_io_in_seconds",
-    "determine_query_length_in_seconds",
-    "compute_minimiser_avg_per_thread_in_seconds",
-    "generate_results_avg_per_thread_in_seconds",
-    "load_index_in_seconds",
-    "query_ibf_avg_per_thread_in_seconds",
-]
-size_structure = [
-    "subkeys",
-    "size_level_0",
-    "size_level_1",
-    "size_level_2",
-    "size_level_3",
+with open("parameters.yaml") as f:
+    config = yaml.load(f, Loader=yaml.FullLoader)
+
+BUILD_DIR = config["BUILD_DIR"]
+PLOT_DIR = config["PLOT_DIR"]
+PLOT_FILE = os.path.join(PLOT_DIR, "index.html")
+TIME_FORMAT = config["TIME_FORMAT"]
+TIME_FORMAT.remove("KEY")
+TIME_FORMAT.remove("wall_clock_time_in_seconds")
+SIZE_FORMAT = [
+    "SUBKEY",
+    "LEVEL_0",
+    "LEVEL_1",
+    "LEVEL_2",
+    "LEVEL_3",
 ]
 
 
@@ -52,36 +51,6 @@ def convert_list_to_string(data):
     return [str(i) for i in data]
 
 
-def convert_time_data(data, key):
-    """Returns a dictionary containing the given data in the format for the time plot."""
-    export = {}
-    export[time_structure[0]] = [f"{key} = {value}" for value in data[0]]
-    export["value"] = data[0]
-    export["all_times"] = [sum(float(i) for i in sublist) for sublist in zip(*data[1:])]
-    for i, element in enumerate(data[1:]):
-        export[time_structure[i + 1]] = convert_list_to_float(element)
-        export[f"{time_structure[i+1]}_percentage"] = devide_arrays_in_percentage(
-            export[time_structure[i + 1]], export["all_times"]
-        )
-    return export
-
-
-def convert_size_data(data, key):
-    """Returns a dictionary containing the given data in the format for the size plot."""
-    export = {}
-    export[size_structure[0]] = [f"{key} = {value}" for value in data[0]]
-    export["value"] = data[0]
-    export["sizes"] = [sum(float(i) for i in sublist) for sublist in zip(*data[1:])]
-    for i, element in enumerate(data[1:5]):
-        export[size_structure[i + 1]] = convert_list_to_float(element)
-        export[f"{size_structure[i+1]}_percentage"] = devide_arrays_in_percentage(
-            export[size_structure[i + 1]], export["sizes"]
-        )
-    for i, element in enumerate(data[5:]):
-        export[f"{size_structure[i+1]}_avg_load_factor"] = element
-    return export
-
-
 def add_arrays(data):
     """Returns a list containing the sum of the given lists."""
     return [sum(float(i) for i in sublist) for sublist in zip(*data)]
@@ -89,7 +58,7 @@ def add_arrays(data):
 
 def get_max_result(data, factor):
     """Returns the maximum value of the given list multiplied by the given factor."""
-    return round(max(add_arrays(data)) * factor)
+    return round(max(add_arrays(data)) * factor,3)
 
 
 def devide_arrays_in_percentage(list1, list2):
@@ -97,57 +66,78 @@ def devide_arrays_in_percentage(list1, list2):
     return [round(float(i) / float(j) * 100, 2) for i, j in zip(list1, list2)]
 
 
+def convert_time_data(data, key):
+    """Returns a dictionary containing the given data in the format for the time plot."""
+    export = {}
+    export[TIME_FORMAT[0]] = [f"{key} = {value}" for value in data[0]]
+    export["value"] = data[0]
+    export["all_times"] = add_arrays(data[1:])
+    for i, element in enumerate(data[1:]):
+        export[TIME_FORMAT[i + 1]] = convert_list_to_float(element)
+        export[f"{TIME_FORMAT[i + 1]}_percentage"] = devide_arrays_in_percentage(
+            export[TIME_FORMAT[i + 1]], export["all_times"]
+        )
+    return export
+
+
+def convert_size_data(data, key):
+    """Returns a dictionary containing the given data in the format for the size plot."""
+    export = {}
+    export[SIZE_FORMAT[0]] = [f"{key} = {value}" for value in data[0]]
+    export["value"] = data[0]
+    export["sizes"] = [sum(float(i) for i in sublist) for sublist in zip(*data[1:5])]
+    for i, element in enumerate(data[1:5]):
+        export[SIZE_FORMAT[i + 1]] = convert_list_to_float(element)
+        export[f"{SIZE_FORMAT[i+1]}_percentage"] = devide_arrays_in_percentage(
+            export[SIZE_FORMAT[i + 1]], export["sizes"]
+        )
+    for i, element in enumerate(data[5:]):
+        export[f"{SIZE_FORMAT[i+1]}_avg_load_factor"] = element
+    return export
+
+
 def create_plot(interactive=False):
     """Creates the plot."""
-    try:
-        os.makedirs(html_dir, exist_ok=True)
-        print(f"Directory {html_dir} created")
-    except OSError:
-        print("files replaced in directory {html_dir}")
-    output_file(filename=html_file, title="HIBF Benchmarks")
+    output_file(filename=PLOT_FILE, title="HIBF Benchmarks")
     curdoc().theme = "dark_minimal"
     if interactive:
         output_notebook()
     tabs = []
-    files_names = ["alpha", "hash", "k", "r-fpr", "none", "U", "U+R"]
-    special_files_names = ["none", "U", "U+R"]
-    files_names_titles = ["alpha", "hash", "k-mer", "r-fpr", "no U+R", "U", "U+R"]
-    for i, file_name in enumerate(files_names):
-        with open(os.path.join(output_timings, file_name + ".csv"), "r", encoding="utf-8") as timing_file, open(
-            os.path.join(output_sizes, file_name + ".csv"), "r", encoding="utf-8"
+    files_names = ["alpha", "hash", "kmer", "relaxed-fpr", "none", "U", "U+R"]
+    files_names_titles = ["alpha", "hash", "k-mer", "relaxed-fpr", "no U no R", "U", "U and R"]
+    for file_name_index, file_name in enumerate(files_names):
+        with open(os.path.join(BUILD_DIR, "prepared_time", file_name), "r", encoding="utf-8") as timing_file, open(
+            os.path.join(BUILD_DIR, "prepared_size", file_name), "r", encoding="utf-8"
         ) as size_file:
-            if file_name in special_files_names:
-                file_name = "t_max"
-            time_reader, size_reader = csv.reader(timing_file), csv.reader(size_file)
+            time_reader = csv.reader(timing_file, delimiter="\t")
+            size_reader = csv.reader(size_file, delimiter="\t")
             time_data_list, size_data_list = list(time_reader), list(size_reader)
-            time_data, size_data = convert_time_data(time_data_list, file_name), convert_size_data(
-                size_data_list, file_name
-            )
-            max_result_time, max_result_size = get_max_result(time_data_list[1:], 1.01), get_max_result(
-                size_data_list[1:], 1.01
-            )
+            time_data = convert_time_data(time_data_list, file_name)
+            size_data = convert_size_data(size_data_list, file_name)
+            max_result_time = get_max_result(time_data_list[1:], 1.01)
+            max_result_size = get_max_result(size_data_list[1:5], 1.01)
             plot1 = figure(
-                y_range=convert_list_to_string(size_data[time_structure[0]]),
+                y_range=convert_list_to_string(size_data[TIME_FORMAT[0]]),
                 x_range=(max_result_time, 0),
-                x_axis_label="time in minutes",
+                x_axis_label="time in seconds",
                 toolbar_location="left",
                 tools="",
             )
             renderers1 = plot1.hbar_stack(
-                stackers=time_structure[1:], y=time_structure[0], height=0.4, source=(time_data), color=Set2_6
+                stackers=TIME_FORMAT[1:], y=TIME_FORMAT[0], height=0.4, source=(time_data), color=Set2_6
             )
             legend_items = []
-            for renderer in renderers1:
-                key, tag = renderer.name, renderer.name
-                legend_items.append((key, [renderer]))
-                if key == "wall_clock_time_in_seconds":
-                    tag = "time_left"
+            names = ["determine query length", "queryfile IO", "load index", "compute minimizer (avg)", "query IBF (avg)", "generate results (avg)"]
+            for i, renderer in enumerate(renderers1):
+                display_key = names[i]
+                key = renderer.name
+                legend_items.append((display_key, [renderer]))
                 plot1.add_tools(
                     HoverTool(
                         tooltips=[
                             (f"{file_name}", "@value"),
-                            ("wall_clock_time_in_seconds", "@all_times{0.00} sek"),
-                            (tag, "@$name{0.00} sek"),
+                            ("wall_clock_time", "@all_times{0.00} sek"),
+                            (file_name, "@$name{0.00} sek"),
                             ("Percentage", f"@{key}_percentage{{0.00}}%"),
                         ],
                         renderers=[renderer],
@@ -157,38 +147,39 @@ def create_plot(interactive=False):
             plot1.toolbar.logo = None
             plot1.yaxis.visible = False
             plot1.extra_y_ranges = {
-                "zusätzliche_achse": FactorRange(factors=convert_list_to_string(size_data[time_structure[0]]))
+                "zusätzliche_achse": FactorRange(factors=convert_list_to_string(size_data[TIME_FORMAT[0]]))
             }
             zweite_y_achse = LinearAxis(y_range_name="zusätzliche_achse")
             zweite_y_achse.major_label_text_font_size = "1pt"
             zweite_y_achse.major_label_text_color = "#15191c"
             plot1.add_layout(zweite_y_achse, "right")
-            plot1.xaxis.ticker = AdaptiveTicker(base=60, mantissas=[1, 2, 5], min_interval=60, max_interval=600)
-            plot1.xaxis.formatter = CustomJSTickFormatter(
-                code="""
-                return (tick / 60);
-            """
-            )
+            plot1.xaxis.ticker = AdaptiveTicker(base=10, mantissas=[1, 2, 5], min_interval=10, max_interval=600)
+            # plot1.xaxis.formatter = CustomJSTickFormatter(
+            #     code="""
+            #     return (tick / 60);
+            # """
+            # )
             plot1.y_range.range_padding = 0.1
             plot1.ygrid.grid_line_color = None
             plot1.axis.minor_tick_line_color = None
-
             plot1.yaxis.major_tick_line_color = None
             plot1.yaxis.minor_tick_line_color = None
             plot1.outline_line_color = None
             plot1.sizing_mode = "scale_both"
-            plot1.title.text = "Double click on legend/plot to hide/show the legend"
+            # plot1.title.text = "Double click on legend/plot to hide/show the legend"
             plot1.title.align = "right"
 
             legend = Legend(items=legend_items)
-            legend.location = "center"
+            legend.location = "left"
             legend.orientation = "vertical"
-            legend.glyph_height = 12
+            legend.glyph_height = 4
             legend.glyph_width = 12
+            legend.spacing = 0
             legend.click_policy = "mute"
+
             # legend.nrows = 3
-            legend.title = "Default parameters:\n\t\t\tt_max = 192\n\t\tunion estimation (U) = yes\n\t\t\trearrangement (R) = yes\n\t\t\tk-mer size (k) = 32\n\t\t\tnumber of hash function (hash) = 2\n\t\t\talpha = 1.2\n\t\t\trelaxed false positive rate (r-fpr) = 0.5\n\t\t\tmaximum false positive rate (fpr) = 0.05"
-            legend.title_text_color = "#e0e0e0"
+            # legend.title = "Default parameters:\n\t\t\tt_max = 192\n\t\tunion estimation (U) = yes\n\t\t\trearrangement (R) = yes\n\t\t\tk-mer size (k) = 32\n\t\t\tnumber of hash function (hash) = 2\n\t\t\talpha = 1.2\n\t\t\trelaxed false positive rate (r-fpr) = 0.5\n\t\t\tmaximum false positive rate (fpr) = 0.05"
+            # legend.title_text_color = "#e0e0e0"
             plot1.add_layout(legend, "left")
             toggle_legend_js = CustomJS(
                 args={"legend": legend},
@@ -199,25 +190,27 @@ def create_plot(interactive=False):
             plot1.js_on_event(events.DoubleTap, toggle_legend_js)
 
             plot2 = figure(
-                y_range=convert_list_to_string(size_data[size_structure[0]]),
+                y_range=convert_list_to_string(size_data[SIZE_FORMAT[0]]),
                 x_range=(0, max_result_size),
                 x_axis_label="size in GB",
                 toolbar_location="right",
                 tools="",
             )
-            legend_items = []
             renderers2 = plot2.hbar_stack(
-                size_structure[1:], y=size_structure[0], height=0.4, source=(size_data), color=Set2_4
+                SIZE_FORMAT[1:], y=SIZE_FORMAT[0], height=0.4, source=(size_data), color=Set2_4
             )
-            for renderer in renderers2:
+            legend_items = []
+            names = ["Level 0", "Level 1", "Level 2", "Level 3"]
+            for i, renderer in enumerate(renderers2):
                 key = renderer.name
-                legend_items.append((key, [renderer]))
+                display_key = names[i]
+                legend_items.append((display_key, [renderer]))
                 plot2.add_tools(
                     HoverTool(
                         tooltips=[
                             (f"{file_name}", "@value"),
                             ("all_level_size", "@sizes{0.00}GB"),
-                            (key, "@$name{0.00}GB"),
+                            (display_key, "@$name{0.00}GB"),
                             ("Percentage", f"@{key}_percentage{{0.00}}%"),
                             ("avg_load_factor", f"@{key}_avg_load_factor{{0.00}}"),
                         ],
@@ -230,12 +223,13 @@ def create_plot(interactive=False):
             plot2.ygrid.grid_line_color = None
             plot2.axis.minor_tick_line_color = None
             plot2.outline_line_color = None
-            plot2.title.text = "Click on legend entries to mute the corresponding bars"
-
+            # plot2.title.text = "Click on legend entries to mute the corresponding bars"
+            plot2.axis.minor_tick_line_color = None
             legend = Legend(items=legend_items)
-            legend.location = "center"
-            legend.glyph_height = 12
+            legend.location = "right"
+            legend.glyph_height = 4
             legend.glyph_width = 12
+            legend.spacing = 0
             legend.click_policy = "mute"
             plot2.add_layout(legend, "right")
             toggle_legend_js = CustomJS(
@@ -245,7 +239,6 @@ def create_plot(interactive=False):
             """,
             )
             plot2.js_on_event(events.DoubleTap, toggle_legend_js)
-
             plot2.yaxis.major_tick_line_color = None
             plot2.yaxis.minor_tick_line_color = None
             plot2.yaxis.major_label_standoff = 15
@@ -253,7 +246,7 @@ def create_plot(interactive=False):
             both_plots = row(plot1, plot2)
             both_plots.sizing_mode = "scale_both"
             vercel_logo = """
-                <svg width="209" height="40" viewBox="0 0 209 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="157" height="30" viewBox="0 0 209 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0 5C0 2.23858 2.23858 0 5 0H204C206.761 0 209 2.23858 209 5V35C209 37.7614 206.761 40 204 40H5C2.23858 40 0 37.7614 0 35V5Z" fill="black"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M20 13L28 27H12L20 13Z" fill="white"/>
                 <line x1="40.5" y1="2.18556e-08" x2="40.5" y2="40" stroke="#333333"/>
@@ -261,17 +254,39 @@ def create_plot(interactive=False):
                 </svg>
             """
             vercel_div = Div(
-                text=f"<a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><svg height=40px>{vercel_logo}</svg></a>",
+                text=f"<a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><svg height=30px>{vercel_logo}</svg></a>",
                 styles={
                     "margin": "0px",
-                    "height": "40px",
                     "display": "block" if "VERCEL" in os.environ else "none",
-                    "width": "100vw",
-                    "text-align": "center",
                 },
             )
             all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
-            tabs.append(TabPanel(child=all_elements, title=files_names_titles[i]))
+            tabs.append(TabPanel(child=all_elements, title=files_names_titles[file_name_index]))
+    latex_text = """
+        <div>
+            <strong>Parameters:</strong><br>
+            <ul>
+                <li><span>Alpha (\\(\\alpha\\)): Influences the ratio of merged bins and split bins</span></li>
+                <li><span>Hash: The number of \\(hash\\) functions for Bloom Filters</span></li>
+                <li><span>\\(k\\)-mer: Choosing window and k-mer size</span></li>
+                <li><span>\\(fpr\\): Sets an upper bound for Bloom Filter false positives</span></li>
+                <li><span>Estimate Union (\\(U\\)): Algorithm estimates sequence similarity between input data</span></li>
+                <li><span>Rearrangement (\\(U+R\\)): Change order of sequences based on their estimated similarity</span></li>
+            </ul>
+            <strong>Default parameters:</strong><br>
+            <ul>
+                <li><span>\\(\\alpha = 1.2\\)</span></li>
+                <li><span>\\(t_{\\text{max}} = 192\\)</span></li>
+                <li><span>\\(\\text{hash} = 2\\)</span></li>
+                <li><span>\\((w,k)=(32,32)\\)</span></li>
+                <li><span>\\(\\text{r-fpr} = 0.5\\)</span></li>
+                <li><span>\\(\\text{fpr} = 0.05\\)</span></li>
+                <li><span>\\(U = True\\)</span></li>
+                <li><span>\\(R = True\\)</span></li>
+            </ul>
+        </div>
+        """
+    tabs.append(TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description"))
     if interactive:
         show(Tabs(tabs=tabs, sizing_mode="scale_both"))
     else:
