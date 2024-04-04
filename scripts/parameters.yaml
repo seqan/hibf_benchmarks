@@ -4,7 +4,7 @@ RAPTOR_BINARY: /srv/data/seiler/hibf_benchmark/raptor
 DISPLAY_LAYOUT_BINARY: /srv/data/seiler/hibf_benchmark/display_layout
 FILENAMES_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/1024.filenames
 QUERY_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/reads_e2_250/all.fastq
-BUILD_DIR: /srv/public/leonard/hibf_benchmarks/scripts/build
+BUILD_DIR: /srv/public/leonard/hibf_benchmarks/build
 PLOT_DIR: /srv/public/leonard/hibf_benchmarks/scripts
 
 # PARAMS:
@@ -58,10 +58,53 @@ SIZE_FORMAT:
   - "AVG_LOAD_FACTOR"
 
 KEYS:
-  - "kmer"
   - "alpha"
   - "hash"
+  - "kmer"
   - "relaxed-fpr"
   - "none"
-  - "U+R"
   - "U"
+  - "U+R"
+
+####################### PLOT PARAMETERS #######################
+
+PLOT_THEME: '/srv/public/leonard/hibf_benchmarks/scripts/bokeh_plot/plot_theme.yaml'
+
+KEYS_TITLES:
+  - "alpha"
+  - "hash"
+  - "k-mer"
+  - "relaxed-fpr"
+  - "no U no R"
+  - "U"
+  - "U and R"
+
+PLOT_TIME_FORMAT:
+  - "SUBKEY"
+  - "determine_query_length_in_seconds"
+  - "query_file_io_in_seconds"
+  - "load_index_in_seconds"
+  - "compute_minimiser_avg_in_seconds"
+  - "query_ibf_avg_in_seconds"
+  - "generate_results_avg_in_seconds"
+
+PLOT_TIME_NAMES:
+  - "Determine query length"
+  - "Queryfile IO"
+  - "Load index"
+  - "Compute minimizer (avg)"
+  - "Query IBF (avg)"
+  - "Generate results (avg)"
+
+PLOT_SIZE_FORMAT:
+  - "SUBKEY"
+  - "LEVEL_0"
+  - "LEVEL_1"
+  - "LEVEL_2"
+  - "LEVEL_3"
+
+PLOT_SIZE_NAMES:
+  - "Level 0"
+  - "Level 1"
+  - "Level 2"
+  - "Level 3"

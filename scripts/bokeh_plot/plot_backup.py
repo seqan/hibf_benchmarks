@@ -21,7 +21,7 @@ from bokeh.models import (
 )
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save, show
-
+from bokeh.themes import Theme
 
 with open("parameters.yaml") as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
@@ -99,12 +99,14 @@ def convert_size_data(data, key):
 def create_plot(interactive=False):
     """Creates the plot."""
     output_file(filename=PLOT_FILE, title="HIBF Benchmarks")
-    curdoc().theme = "dark_minimal"
+    curdoc().theme = Theme(filename="./plot_theme.yaml")
     if interactive:
         output_notebook()
     tabs = []
     files_names = ["alpha", "hash", "kmer", "relaxed-fpr", "none", "U", "U+R"]
     files_names_titles = ["alpha", "hash", "k-mer", "relaxed-fpr", "no U no R", "U", "U and R"]
+    time_names = ["Determine query length", "Dueryfile IO", "Load index", "Compute minimizer (avg)", "Query IBF (avg)", "Generate results (avg)"]
+    size_names = ["Level 0", "Level 1", "Level 2", "Level 3"]
     for file_name_index, file_name in enumerate(files_names):
         with open(os.path.join(BUILD_DIR, "prepared_time", file_name), "r", encoding="utf-8") as timing_file, open(
             os.path.join(BUILD_DIR, "prepared_size", file_name), "r", encoding="utf-8"
@@ -116,10 +118,10 @@ def create_plot(interactive=False):
             size_data = convert_size_data(size_data_list, file_name)
             max_result_time = get_max_result(time_data_list[1:], 1.01)
             max_result_size = get_max_result(size_data_list[1:5], 1.01)
+            scale_in_minutes = True if max_result_time > 120 else False
             plot1 = figure(
                 y_range=convert_list_to_string(size_data[TIME_FORMAT[0]]),
                 x_range=(max_result_time, 0),
-                x_axis_label="time in seconds",
                 toolbar_location="left",
                 tools="",
             )
@@ -127,17 +129,16 @@ def create_plot(interactive=False):
                 stackers=TIME_FORMAT[1:], y=TIME_FORMAT[0], height=0.4, source=(time_data), color=Set2_6
             )
             legend_items = []
-            names = ["determine query length", "queryfile IO", "load index", "compute minimizer (avg)", "query IBF (avg)", "generate results (avg)"]
             for i, renderer in enumerate(renderers1):
-                display_key = names[i]
+                display_key = time_names[i]
                 key = renderer.name
                 legend_items.append((display_key, [renderer]))
                 plot1.add_tools(
                     HoverTool(
                         tooltips=[
-                            (f"{file_name}", "@value"),
-                            ("wall_clock_time", "@all_times{0.00} sek"),
-                            (file_name, "@$name{0.00} sek"),
+                            (file_name, "@value"),
+                            ("Wall clock time", "@all_times{0.00} sek"),
+                            (display_key, "@$name{0.00} sek"),
                             ("Percentage", f"@{key}_percentage{{0.00}}%"),
                         ],
                         renderers=[renderer],
@@ -153,20 +154,20 @@ def create_plot(interactive=False):
             zweite_y_achse.major_label_text_font_size = "1pt"
             zweite_y_achse.major_label_text_color = "#15191c"
             plot1.add_layout(zweite_y_achse, "right")
-            plot1.xaxis.ticker = AdaptiveTicker(base=10, mantissas=[1, 2, 5], min_interval=10, max_interval=600)
-            # plot1.xaxis.formatter = CustomJSTickFormatter(
-            #     code="""
-            #     return (tick / 60);
-            # """
-            # )
+            if scale_in_minutes:
+              plot1.xaxis.ticker = AdaptiveTicker(base=60, min_interval=60)
+              plot1.xaxis.axis_label = "time in minutes"
+              plot1.xaxis.formatter = CustomJSTickFormatter(
+                  code="""
+                  return (tick / 60);
+              """
+              )
+            else:
+              plot1.xaxis.ticker = AdaptiveTicker(base=10, min_interval=10)
+              plot1.xaxis.axis_label = "time in seconds"
             plot1.y_range.range_padding = 0.1
             plot1.ygrid.grid_line_color = None
-            plot1.axis.minor_tick_line_color = None
-            plot1.yaxis.major_tick_line_color = None
-            plot1.yaxis.minor_tick_line_color = None
-            plot1.outline_line_color = None
             plot1.sizing_mode = "scale_both"
-            # plot1.title.text = "Double click on legend/plot to hide/show the legend"
             plot1.title.align = "right"
 
             legend = Legend(items=legend_items)
@@ -176,10 +177,6 @@ def create_plot(interactive=False):
             legend.glyph_width = 12
             legend.spacing = 0
             legend.click_policy = "mute"
-
-            # legend.nrows = 3
-            # legend.title = "Default parameters:\n\t\t\tt_max = 192\n\t\tunion estimation (U) = yes\n\t\t\trearrangement (R) = yes\n\t\t\tk-mer size (k) = 32\n\t\t\tnumber of hash function (hash) = 2\n\t\t\talpha = 1.2\n\t\t\trelaxed false positive rate (r-fpr) = 0.5\n\t\t\tmaximum false positive rate (fpr) = 0.05"
-            # legend.title_text_color = "#e0e0e0"
             plot1.add_layout(legend, "left")
             toggle_legend_js = CustomJS(
                 args={"legend": legend},
@@ -200,10 +197,9 @@ def create_plot(interactive=False):
                 SIZE_FORMAT[1:], y=SIZE_FORMAT[0], height=0.4, source=(size_data), color=Set2_4
             )
             legend_items = []
-            names = ["Level 0", "Level 1", "Level 2", "Level 3"]
             for i, renderer in enumerate(renderers2):
                 key = renderer.name
-                display_key = names[i]
+                display_key = size_names[i]
                 legend_items.append((display_key, [renderer]))
                 plot2.add_tools(
                     HoverTool(
@@ -223,7 +219,6 @@ def create_plot(interactive=False):
             plot2.ygrid.grid_line_color = None
             plot2.axis.minor_tick_line_color = None
             plot2.outline_line_color = None
-            # plot2.title.text = "Click on legend entries to mute the corresponding bars"
             plot2.axis.minor_tick_line_color = None
             legend = Legend(items=legend_items)
             legend.location = "right"
@@ -284,6 +279,20 @@ def create_plot(interactive=False):
                 <li><span>\\(U = True\\)</span></li>
                 <li><span>\\(R = True\\)</span></li>
             </ul>
+            <strong>Legend:</strong><br>
+            <ul>
+              <li><span>Determine query length: Time to determine the length of the query</span></li>
+              <li><span>Queryfile IO: Time to read the query file</span></li>
+              <li><span>Load index: Time to load the index</span></li>
+              <li><span>Compute minimizer (avg): Average time to compute minimizer per thread</span></li>
+              <li><span>Query IBF (avg): Average time to query the IBF per thread</span></li>
+              <li><span>Generate results (avg): Average time to generate results per thread</span></li>
+              <li><span>Level 0: Size of the first level of the index</span></li>
+              <li><span>Level 1: Size of the second level of the index</span></li>
+              <li><span>Level 2: Size of the third level of the index</span></li>
+              <li><span>Level 3: Size of the fourth level of the index</span></li>
+              <li><span>Avg load factor: Average load factor of the index</span></li>
+            </ul>
         </div>
         """
     tabs.append(TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description"))
@@ -296,12 +305,20 @@ def create_plot(interactive=False):
             }
 
             :host(.bk-Tabs) .bk-header {
-            color: #e0e0e0;
-            border-bottom: 1px solid #9c9c9c;
+            color: #d0d0d0;
             }
 
-            .bk-tab:hover {
-                background-color: #7B7D7E;
+            .bk-tab.bk-active {
+                background-color: #d0d0d0;
+                color: black;
+            }
+
+            .bk-tab:not(.bk-active):hover {
+                background-color: #404040;
+            }
+            
+            .bk-tab:focus {
+                outline: none;
             }
             """
         global_style = """

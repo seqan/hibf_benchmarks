@@ -33,9 +33,5 @@ rule plot_data:
         "log/plot_data.log",
     conda:
         "../envs/bokeh_env.yaml"
-    shell:
-        """
-        (echo "[$(date +"%Y-%m-%d %T")] Plotting data."
-        python plot.py
-        ) &>> {log}
-        """
+    script:
+        "../bokeh_plot/plot.py"

@@ -3,6 +3,7 @@ rule raptor_layout:
     LAYOUT_FILE=f"{config['BUILD_DIR']}/{{key}}={{param}}/layout",
     LAYOUT_TIME=f"{config['BUILD_DIR']}/{{key}}={{param}}/layout.time",
   threads: config["NUM_THREADS"]
+  priority: 2
   log:
     "log/raptor_layout_{key}_{param}.log",
   conda:
@@ -61,6 +62,7 @@ rule raptor_build:
     INDEX_FILE=f"{config['BUILD_DIR']}/{{key}}={{param}}/index",
     INDEX_TIME=f"{config['BUILD_DIR']}/{{key}}={{param}}/index.time",
   threads: config["NUM_THREADS"]
+  priority: 1
   log:
     "log/raptor_build_{key}_{param}.log",
   conda:
