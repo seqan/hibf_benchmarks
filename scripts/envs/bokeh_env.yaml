@@ -1,9 +1,7 @@
 name: bokeh_env
 channels:
   - conda-forge
-  - bioconda
   - defaults
 dependencies:
-  - python=3.12.2
-  - bokeh
-  - snakemake
+  - bokeh=3.3.4
+  - bioconda::snakemake=8.4.2
