@@ -3,5 +3,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - bokeh=3.3.4
+  - bokeh=3.4.1
   - bioconda::snakemake=8.4.2

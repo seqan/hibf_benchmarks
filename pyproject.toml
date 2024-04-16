@@ -22,3 +22,6 @@ max-args = 7
 
 [tool.pylint.reports]
 score = false
+
+[tool.snakefmt]
+line_length = 120

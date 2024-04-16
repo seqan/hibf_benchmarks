@@ -1,7 +1,12 @@
 configfile: "parameters.yaml"
 
 
-include: "rules/run_raptor.smk"
+# https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+if os.getenv("CI", "false") == "false":
+
+    include: "rules/run_raptor.smk"
+
+
 include: "rules/summarize.smk"
 include: "rules/plot.smk"
 
