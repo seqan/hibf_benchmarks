@@ -1,3 +1,6 @@
+"""Functions for creating CSS and HTML components for the Bokeh plot."""
+
+
 import os
 
 from bokeh.models import Div
@@ -89,7 +92,7 @@ def get_tab_style():
         .bk-tab:not(.bk-active):hover {
             background-color: #303030;
         }
-        
+
         .bk-tab:focus {
             outline: none;
         }

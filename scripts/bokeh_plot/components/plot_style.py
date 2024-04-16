@@ -1,14 +1,14 @@
+"""Functions to configure the style of the plots."""
+
 from bokeh import events
 from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis
 
-# from components.helpers import replace_keys
 
-
-def add_hover_tool(plot, renderer, key, display_key, file_name, format):
+def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
     """Adds a hover tool to the plot."""
-    if file_name == "none" or file_name == "U" or file_name == "U+R":
+    if file_name in ("none", "U", "U+R"):
         file_name = "tmax"
-    if format == "TIME_FORMAT":
+    if format_kind == "TIME_FORMAT":
         plot.add_tools(
             HoverTool(
                 tooltips=[
@@ -35,15 +35,15 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format):
         )
 
 
-def add_legend(plot, renderers, file_name, TIME_NAMES, SIZE_NAMES, format, location):
+def add_legend(plot, renderers, file_name, time_names, size_names, format_kind, location):
     """Adds a legend to the plot."""
-    key_format = TIME_NAMES if format == "TIME_FORMAT" else SIZE_NAMES
+    key_format = time_names if format_kind == "TIME_FORMAT" else size_names
     legend_items = []
     for i, renderer in enumerate(renderers):
         display_key = key_format[i]
         key = renderer.name
         legend_items.append((display_key, [renderer]))
-        add_hover_tool(plot, renderer, key, display_key, file_name, format)
+        add_hover_tool(plot, renderer, key, display_key, file_name, format_kind)
     legend = Legend(items=legend_items)
     legend.location = "left"
     legend.orientation = "vertical"

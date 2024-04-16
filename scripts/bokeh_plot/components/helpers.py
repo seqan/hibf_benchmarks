@@ -1,3 +1,6 @@
+"""Helper functions."""
+
+
 def convert_list_to_float(data):
     """Returns a list containing the values of the given list as floats."""
     return [float(i) for i in data]

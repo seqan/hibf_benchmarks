@@ -14,9 +14,8 @@ from components.helpers import convert_list_to_string, get_max_result
 from components.plot_css_html import create_latex_text, create_vercel_div, get_global_style, get_tab_style
 from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot
 
-with open("/srv/public/leonard/hibf_benchmarks/scripts/parameters.yaml") as f:
-    config = yaml.load(f, Loader=yaml.FullLoader)
-
+with open(os.path.join(os.path.dirname(__file__), "../parameters.yaml"), "r", encoding="utf-8") as file:
+    config = yaml.load(file, Loader=yaml.FullLoader)
 
 BUILD_DIR = config["BUILD_DIR"]
 PLOT_DIR = config["PLOT_DIR"]
@@ -79,7 +78,7 @@ def create_plot():
             size_data = convert_size_data(size_data_list, file_name, SIZE_FORMAT)
             max_result_time = get_max_result(time_data_list[1:], 1.01)
             max_result_size = get_max_result(size_data_list[1:5], 1.01)
-            scale_in_minutes = True if max_result_time > 120 else False
+            scale_in_minutes = max_result_time > 120
 
             size_y_range = convert_list_to_string(size_data["SUBKEY"])
             time_y_range = convert_list_to_string(time_data["SUBKEY"])
