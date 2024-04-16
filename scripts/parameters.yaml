@@ -35,7 +35,7 @@ DEFAULT_PARAMS:
   R_FPR: 0.5
   M_FPR: 0.05
   WINDOW_SIZE: 32
-  MODE: U+R
+  MODE: [U+R]
 
 NUM_THREADS: 1 # Number of threads to use per task, not for parallel execution
 
