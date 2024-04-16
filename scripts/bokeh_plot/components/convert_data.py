@@ -1,5 +1,6 @@
 from components.helpers import add_arrays, convert_list_to_float, devide_arrays_in_percentage
 
+
 def convert_time_data(data, key, TIME_FORMAT):
     """Returns a dictionary containing the given data in the format for the time plot."""
     export = {}

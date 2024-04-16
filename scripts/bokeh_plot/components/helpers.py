@@ -15,7 +15,7 @@ def add_arrays(data):
 
 def get_max_result(data, factor):
     """Returns the maximum value of the given list multiplied by the given factor."""
-    return round(max(add_arrays(data)) * factor,3)
+    return round(max(add_arrays(data)) * factor, 3)
 
 
 def devide_arrays_in_percentage(list1, list2):

@@ -17,14 +17,15 @@ def create_vercel_div():
         text=f"<a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><svg height=30px>{vercel_logo}</svg></a>",
         styles={
             "margin": "0px",
-            "display": "block" if "VERCEL" in os.environ else "none",},)
+            "display": "block" if "VERCEL" in os.environ else "none",
+        },
+    )
     return vercel_div
 
 
 def create_latex_text():
     """Creates a div containing the description of the plot."""
-    return(
-        """
+    return """
         <div>
             <strong>Parameters:</strong><br>
             <ul>
@@ -61,13 +62,12 @@ def create_latex_text():
               <li><span>Avg load factor: Average load factor of the index</span></li>
             </ul>
         </div>
-        """)
+        """
 
 
 def get_tab_style():
     """Returns the CSS style for the tabs."""
-    return (
-        """
+    return """
         :host(.bk-Tabs) {
             background-color: #15191c;
         }
@@ -93,13 +93,12 @@ def get_tab_style():
         .bk-tab:focus {
             outline: none;
         }
-        """)
+        """
 
 
 def get_global_style():
     """Returns the global CSS style."""
-    return (
-        """
+    return """
         body { background: #15191c; }
         div { max-height: 96vh; max-width: 100vw; }
-        """)
+        """

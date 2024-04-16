@@ -1,20 +1,13 @@
 from bokeh import events
-from bokeh.models import (
-    AdaptiveTicker,
-    CustomJS,
-    CustomJSTickFormatter,
-    FactorRange,
-    HoverTool,
-    Legend,
-    LinearAxis,
-)
+from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis
 
 # from components.helpers import replace_keys
 
+
 def add_hover_tool(plot, renderer, key, display_key, file_name, format):
     """Adds a hover tool to the plot."""
-    if file_name == 'none' or file_name == 'U' or file_name == 'U+R':
-        file_name = 'tmax'
+    if file_name == "none" or file_name == "U" or file_name == "U+R":
+        file_name = "tmax"
     if format == "TIME_FORMAT":
         plot.add_tools(
             HoverTool(
@@ -24,7 +17,9 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format):
                     (display_key, "@$name{0.00} sek"),
                     ("Percentage", f"@{key}_percentage{{0.00}}%"),
                 ],
-                renderers=[renderer],))
+                renderers=[renderer],
+            )
+        )
     else:
         plot.add_tools(
             HoverTool(
@@ -35,7 +30,9 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format):
                     ("Percentage", f"@{key}_percentage{{0.00}}%"),
                     ("Load Factor (avg)", f"@{key}_avg_load_factor{{0.00}}"),
                 ],
-                renderers=[renderer],))
+                renderers=[renderer],
+            )
+        )
 
 
 def add_legend(plot, renderers, file_name, TIME_NAMES, SIZE_NAMES, format, location):
@@ -57,10 +54,10 @@ def add_legend(plot, renderers, file_name, TIME_NAMES, SIZE_NAMES, format, locat
     plot.add_layout(legend, location)
     toggle_legend_js = CustomJS(
         args={"legend": legend},
-        code=
-            """
+        code="""
             legend.visible = !legend.visible
-            """,)
+            """,
+    )
     plot.js_on_event(events.DoubleTap, toggle_legend_js)
 
 

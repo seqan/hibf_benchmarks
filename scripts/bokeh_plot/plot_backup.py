@@ -2,8 +2,8 @@
 
 import csv
 import os
-import yaml
 
+import yaml
 from bokeh import events
 from bokeh.io import output_notebook
 from bokeh.layouts import column, row
@@ -58,7 +58,7 @@ def add_arrays(data):
 
 def get_max_result(data, factor):
     """Returns the maximum value of the given list multiplied by the given factor."""
-    return round(max(add_arrays(data)) * factor,3)
+    return round(max(add_arrays(data)) * factor, 3)
 
 
 def devide_arrays_in_percentage(list1, list2):
@@ -105,7 +105,14 @@ def create_plot(interactive=False):
     tabs = []
     files_names = ["alpha", "hash", "kmer", "relaxed-fpr", "none", "U", "U+R"]
     files_names_titles = ["alpha", "hash", "k-mer", "relaxed-fpr", "no U no R", "U", "U and R"]
-    time_names = ["Determine query length", "Dueryfile IO", "Load index", "Compute minimizer (avg)", "Query IBF (avg)", "Generate results (avg)"]
+    time_names = [
+        "Determine query length",
+        "Dueryfile IO",
+        "Load index",
+        "Compute minimizer (avg)",
+        "Query IBF (avg)",
+        "Generate results (avg)",
+    ]
     size_names = ["Level 0", "Level 1", "Level 2", "Level 3"]
     for file_name_index, file_name in enumerate(files_names):
         with open(os.path.join(BUILD_DIR, "prepared_time", file_name), "r", encoding="utf-8") as timing_file, open(
@@ -155,16 +162,16 @@ def create_plot(interactive=False):
             zweite_y_achse.major_label_text_color = "#15191c"
             plot1.add_layout(zweite_y_achse, "right")
             if scale_in_minutes:
-              plot1.xaxis.ticker = AdaptiveTicker(base=60, min_interval=60)
-              plot1.xaxis.axis_label = "time in minutes"
-              plot1.xaxis.formatter = CustomJSTickFormatter(
-                  code="""
+                plot1.xaxis.ticker = AdaptiveTicker(base=60, min_interval=60)
+                plot1.xaxis.axis_label = "time in minutes"
+                plot1.xaxis.formatter = CustomJSTickFormatter(
+                    code="""
                   return (tick / 60);
               """
-              )
+                )
             else:
-              plot1.xaxis.ticker = AdaptiveTicker(base=10, min_interval=10)
-              plot1.xaxis.axis_label = "time in seconds"
+                plot1.xaxis.ticker = AdaptiveTicker(base=10, min_interval=10)
+                plot1.xaxis.axis_label = "time in seconds"
             plot1.y_range.range_padding = 0.1
             plot1.ygrid.grid_line_color = None
             plot1.sizing_mode = "scale_both"
@@ -295,7 +302,9 @@ def create_plot(interactive=False):
             </ul>
         </div>
         """
-    tabs.append(TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description"))
+    tabs.append(
+        TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description")
+    )
     if interactive:
         show(Tabs(tabs=tabs, sizing_mode="scale_both"))
     else:

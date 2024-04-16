@@ -2,23 +2,17 @@
 
 import csv
 import os
-import yaml
 
+import yaml
 from bokeh.layouts import column, row
-from bokeh.models import (
-    Div,
-    TabPanel,
-    Tabs,
-)
+from bokeh.models import Div, TabPanel, Tabs
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save
 from bokeh.themes import Theme
-
-from components.plot_css_html import create_latex_text, create_vercel_div, get_global_style, get_tab_style
-from components.helpers import convert_list_to_string, get_max_result
 from components.convert_data import convert_size_data, convert_time_data
-from components.plot_style import configure_size_plot, configure_time_plot, add_legend, add_second_y_axis
-
+from components.helpers import convert_list_to_string, get_max_result
+from components.plot_css_html import create_latex_text, create_vercel_div, get_global_style, get_tab_style
+from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot
 
 with open("/srv/public/leonard/hibf_benchmarks/scripts/parameters.yaml") as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
@@ -63,9 +57,7 @@ def create_size_plot(size_data, y_range, max_result_size, file_name):
         toolbar_location="right",
         tools="",
     )
-    renderers = plot.hbar_stack(
-        SIZE_FORMAT[1:], y=SIZE_FORMAT[0], height=0.4, source=(size_data), color=Set2_4
-    )
+    renderers = plot.hbar_stack(SIZE_FORMAT[1:], y=SIZE_FORMAT[0], height=0.4, source=(size_data), color=Set2_4)
     configure_size_plot(plot)
     add_legend(plot, renderers, file_name, TIME_NAMES, SIZE_NAMES, "SIZE_FORMAT", "right")
     return plot
@@ -88,7 +80,7 @@ def create_plot():
             max_result_time = get_max_result(time_data_list[1:], 1.01)
             max_result_size = get_max_result(size_data_list[1:5], 1.01)
             scale_in_minutes = True if max_result_time > 120 else False
-            
+
             size_y_range = convert_list_to_string(size_data["SUBKEY"])
             time_y_range = convert_list_to_string(time_data["SUBKEY"])
             y_range = size_y_range if len(size_y_range) > len(time_y_range) else time_y_range
@@ -101,9 +93,12 @@ def create_plot():
             all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
             tabs.append(TabPanel(child=all_elements, title=FILES_NAMES[file_name_index]))
     latex_text = create_latex_text()
-    tabs.append(TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description"))
+    tabs.append(
+        TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description")
+    )
     tab_style = get_tab_style()
     global_style = get_global_style()
     save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[tab_style, global_style]))
+
 
 create_plot()
