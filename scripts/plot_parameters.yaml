@@ -1,0 +1,50 @@
+PLOT_FILE: /srv/public/leonard/hibf_benchmarks/bokeh_plot.html
+THEME: '/srv/public/leonard/hibf_benchmarks/scripts/bokeh_plot/plot_theme.yaml'
+
+KEYS_FORMAT:
+  - "alpha"
+  - "hash"
+  - "kmer"
+  - "relaxed-fpr"
+  - "none"
+  - "U"
+  - "U+R"
+
+KEYS_NAMES:
+  - "alpha"
+  - "hash"
+  - "k-mer"
+  - "relaxed-fpr"
+  - "no U no R"
+  - "U"
+  - "U and R"
+
+TIME_FORMAT:
+  - "SUBKEY"
+  - "determine_query_length_in_seconds"
+  - "query_file_io_in_seconds"
+  - "load_index_in_seconds"
+  - "compute_minimiser_max_in_seconds"
+  - "query_ibf_max_in_seconds"
+  - "generate_results_max_in_seconds"
+
+TIME_NAMES:
+  - "Determine query length"
+  - "Queryfile IO"
+  - "Load index"
+  - "Compute minimizer (max)"
+  - "Query IBF (max)"
+  - "Generate results (max)"
+
+SIZE_FORMAT:
+  - "SUBKEY"
+  - "LEVEL_0"
+  - "LEVEL_1"
+  - "LEVEL_2"
+  - "LEVEL_3"
+
+SIZE_NAMES:
+  - "Level 0"
+  - "Level 1"
+  - "Level 2"
+  - "Level 3"

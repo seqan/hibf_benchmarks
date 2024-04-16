@@ -1,7 +1,6 @@
 """Functions for creating CSS and HTML components for the Bokeh plot."""
 
 import os
-
 from bokeh.models import Div
 
 

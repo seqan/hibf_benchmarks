@@ -24,7 +24,3 @@ def get_max_result(data, factor):
 def devide_arrays_in_percentage(list1, list2):
     """Returns the percentage of each element from list1 to list2."""
     return [round(float(i) / float(j) * 100, 2) for i, j in zip(list1, list2)]
-
-
-# def replace_keys(y_range):
-#     return [item.replace("U+R", "tmux").replace("U", "tmux").replace("none", "tmux") for item in y_range]

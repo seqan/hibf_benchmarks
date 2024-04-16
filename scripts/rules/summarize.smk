@@ -1,34 +1,30 @@
-rule store_timings:
+rule summerize_timings:
     input:
-        files=expand(
+        INPUT_FILES=expand(
             f"{config['BUILD_DIR']}/{{param}}/out.time",
             param=[f"alpha={str(param).replace('.', '_')}" for param in config["PARAMS"]["ALPHA"]]
-            + [
-                f"{param1}={param2}"
+            + [f"{param1}={param2}"
                 for param1 in config["PARAMS"]["MODE"] or config["DEFAULT_PARAMS"]["MODE"]
-                for param2 in config["PARAMS"]["T_MAX"] or config["DEFAULT_PARAMS"]["T_MAX"]
-            ]
+                for param2 in config["PARAMS"]["T_MAX"] or config["DEFAULT_PARAMS"]["T_MAX"]]
             + [f"hash={param}" for param in config["PARAMS"]["NUM_HASHES"] if param < 6]
             + [f"kmer={param}" for param in config["PARAMS"]["KMER_SIZE"]]
             + [f"relaxed-fpr={str(param).replace('.', '_')}" for param in config["PARAMS"]["RELAXED_FPR"]],
         ),
     output:
-        f"{config['BUILD_DIR']}/time",
+        OUTPUT_FILE = f"{config['BUILD_DIR']}/time",
+    params:
+        FORMAT = config['TIME_FORMAT'],
     log:
-        "log/store_timings.log",
+        f"{config['LOG_DIR']}/summerize_timings.log",
     conda:
-        "../envs/r_basic_env.yaml"
-    shell:
-        """
-        (echo "[$(date +"%Y-%m-%d %T")] Storing timings."
-        Rscript summarize_results.r "time_format" {input.files}
-        ) &>> {log}
-        """
+        "../../envs/r_basic_env.yaml"
+    script:
+        "../summarize_results.R"
 
 
-rule store_sizes:
+rule summerize_sizes:
     input:
-        files=expand(
+        INPUT_FILES=expand(
             f"{config['BUILD_DIR']}/{{param}}/out.sizes",
             param=[f"alpha={str(param).replace('.', '_')}" for param in config["PARAMS"]["ALPHA"]]
             + [
@@ -41,14 +37,12 @@ rule store_sizes:
             + [f"relaxed-fpr={str(param).replace('.', '_')}" for param in config["PARAMS"]["RELAXED_FPR"]],
         ),
     output:
-        f"{config['BUILD_DIR']}/size",
+        OUTPUT_FILE=f"{config['BUILD_DIR']}/size",
+    params:
+        FORMAT=config['SIZE_FORMAT'],
     log:
-        "log/store_sizes.log",
+        f"{config['LOG_DIR']}/summerize_sizes.log",
     conda:
-        "../envs/r_basic_env.yaml"
-    shell:
-        """
-        (echo "[$(date +"%Y-%m-%d %T")] Storing sizes."
-        Rscript summarize_results.r "size_format" {input.files}
-        ) &>> {log}
-        """
+        "../../envs/r_basic_env.yaml"
+    script:
+        "../summarize_results.R"

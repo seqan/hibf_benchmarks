@@ -1,5 +1,7 @@
 name: r_basic_env
 channels:
   - conda-forge
+  - defaults
 dependencies:
-  - r-base=4.2.2
+  - r-base=4.3.3
+  - r-tidyr=1.3.1

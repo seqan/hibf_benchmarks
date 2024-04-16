@@ -1,5 +1,5 @@
 attrs:
-    Figure:
+    figure:
         background_fill_color: '#20262b'
         border_fill_color: '#15191c'
         outline_line_color: null

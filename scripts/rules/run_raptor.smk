@@ -5,9 +5,9 @@ rule raptor_layout:
     threads: config["NUM_THREADS"]
     priority: 2
     log:
-        "log/raptor_layout_{key}_{param}.log",
+        f"{config['LOG_DIR']}/raptor_layout/{{key}}_{{param}}.log",
     conda:
-        "../envs/raptor_env.yaml"
+        "../../envs/raptor_env.yaml"
     params:
         RAPTOR_BINARY=config["RAPTOR_BINARY"],
         FILENAMES_FILE=config["FILENAMES_FILE"],
@@ -64,9 +64,9 @@ rule raptor_build:
     threads: config["NUM_THREADS"]
     priority: 1
     log:
-        "log/raptor_build_{key}_{param}.log",
+        f"{config['LOG_DIR']}/raptor_build/{{key}}_{{param}}.log",
     conda:
-        "../envs/raptor_env.yaml"
+        "../../envs/raptor_env.yaml"
     params:
         RAPTOR_BINARY=config["RAPTOR_BINARY"],
         WINDOW_SIZE=config["DEFAULT_PARAMS"]["WINDOW_SIZE"],
@@ -92,9 +92,9 @@ rule raptor_search:
         RESULT_TIME=f"{config['BUILD_DIR']}/{{key}}={{param}}/out.time",
     threads: config["NUM_THREADS"]
     log:
-        "log/raptor_search_{key}_{param}.log",
+        f"{config['LOG_DIR']}/raptor_search/{{key}}_{{param}}.log",
     conda:
-        "../envs/raptor_env.yaml"
+        "../../envs/raptor_env.yaml"
     params:
         RAPTOR_BINARY=config["RAPTOR_BINARY"],
         QUERY_FILE=config["QUERY_FILE"],
@@ -121,9 +121,9 @@ rule display_layout:
         SIZE_FILE=f"{config['BUILD_DIR']}/{{key}}={{param}}/out.sizes",
     threads: config["NUM_THREADS"]
     log:
-        "log/display_layout_{key}_{param}.log",
+        f"{config['LOG_DIR']}/display_layout/{{key}}_{{param}}.log",
     conda:
-        "../envs/raptor_env.yaml"
+        "../../envs/raptor_env.yaml"
     params:
         DISPLAY_LAYOUT_BINARY=config["DISPLAY_LAYOUT_BINARY"],
         WINDOW_SIZE=config["DEFAULT_PARAMS"]["WINDOW_SIZE"],

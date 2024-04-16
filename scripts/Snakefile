@@ -1,9 +1,13 @@
-configfile: "parameters.yaml"
+import yaml
+with open("parameters.yaml", 'r') as f:
+    config = yaml.safe_load(f)
+
+with open("plot_parameters.yaml", 'r') as f:
+    plot_config = yaml.safe_load(f)
 
 
 # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
 if os.getenv("CI", "false") == "false":
-
     include: "rules/run_raptor.smk"
 
 
@@ -13,4 +17,4 @@ include: "rules/plot.smk"
 
 rule all:
     input:
-        f"{config['PLOT_DIR']}/index.html",
+        f"{plot_config['PLOT_FILE']}",

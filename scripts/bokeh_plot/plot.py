@@ -1,33 +1,31 @@
-"""Creates a plot."""
+from components.log_init import log_init
+log_init(snakemake.log[0])
 
 import csv
 import os
 
-import yaml
 from bokeh.layouts import column, row
 from bokeh.models import Div, TabPanel, Tabs
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save
 from bokeh.themes import Theme
+
 from components.convert_data import convert_size_data, convert_time_data
 from components.helpers import convert_list_to_string, get_max_result
 from components.plot_css_html import create_latex_text, create_vercel_div, get_global_style, get_tab_style
 from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot
 
-with open(os.path.join(os.path.dirname(__file__), "../parameters.yaml"), "r", encoding="utf-8") as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
 
-BUILD_DIR = config["BUILD_DIR"]
-PLOT_DIR = config["PLOT_DIR"]
-PLOT_FILE = os.path.join(PLOT_DIR, "index.html")
-PLOT_THEME = config["PLOT_THEME"]
+BUILD_DIR = snakemake.params["BUILD_DIR"]
+PLOT_FILE = snakemake.params["PLOT_FILE"]
+THEME = snakemake.params["THEME"]
 
-TIME_FORMAT = config["PLOT_TIME_FORMAT"]
-TIME_NAMES = config["PLOT_TIME_NAMES"]
-SIZE_FORMAT = config["PLOT_SIZE_FORMAT"]
-SIZE_NAMES = config["PLOT_SIZE_NAMES"]
-FILES_FORMAT = config["KEYS"]
-FILES_NAMES = config["KEYS_TITLES"]
+TIME_FORMAT = snakemake.params["TIME_FORMAT"]
+TIME_NAMES = snakemake.params["TIME_NAMES"]
+SIZE_FORMAT = snakemake.params["SIZE_FORMAT"]
+SIZE_NAMES = snakemake.params["SIZE_NAMES"]
+KEYS_FORMAT = snakemake.params["KEYS_FORMAT"]
+KEYS_NAMES = snakemake.params["KEYS_NAMES"]
 
 
 def create_time_plot(time_data, y_range, max_result_time, file_name, scale_in_minutes):
@@ -63,11 +61,11 @@ def create_size_plot(size_data, y_range, max_result_size, file_name):
 
 
 def create_plot():
-    """Creates the plot."""
+    """Creates the final plot."""
     output_file(filename=PLOT_FILE, title="HIBF Benchmarks")
-    curdoc().theme = Theme(filename=PLOT_THEME)
+    curdoc().theme = Theme(filename=THEME)
     tabs = []
-    for file_name_index, file_name in enumerate(FILES_FORMAT):
+    for file_name_index, file_name in enumerate(KEYS_FORMAT):
         with open(os.path.join(BUILD_DIR, "prepared_time", file_name), "r", encoding="utf-8") as timing_file, open(
             os.path.join(BUILD_DIR, "prepared_size", file_name), "r", encoding="utf-8"
         ) as size_file:
@@ -90,7 +88,7 @@ def create_plot():
 
             vercel_div = create_vercel_div()
             all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
-            tabs.append(TabPanel(child=all_elements, title=FILES_NAMES[file_name_index]))
+            tabs.append(TabPanel(child=all_elements, title=KEYS_NAMES[file_name_index]))
     latex_text = create_latex_text()
     tabs.append(
         TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description")
@@ -99,5 +97,5 @@ def create_plot():
     global_style = get_global_style()
     save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[tab_style, global_style]))
 
-
 create_plot()
+print("Plot created successfully.")
