@@ -2,7 +2,7 @@ log_file <- file(snakemake@log[[1]], open = "wt")
 sink(log_file)
 sink(log_file, type = "message")
 
-FILE_PATHS <- snakemake@input[["INPUT_FILES"]]
+INPUT_FILES <- snakemake@input[["INPUT_FILES"]]
 OUTPUT_FILE <- snakemake@output[["OUTPUT_FILE"]]
 FORMAT <- snakemake@params[["FORMAT"]]
 
@@ -34,7 +34,7 @@ read_and_modify <- function(FILE_PATH) {
     return(data)
 }
 
-list_of_dfs <- lapply(FILE_PATHS, read_and_modify)
+list_of_dfs <- lapply(INPUT_FILES, read_and_modify)
 combined_df <- do.call(rbind, list_of_dfs)
 
 write.table(combined_df, file = OUTPUT_FILE, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
