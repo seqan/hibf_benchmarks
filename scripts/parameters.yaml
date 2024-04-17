@@ -1,0 +1,75 @@
+# https://github.com/yte-template-engine/yte/tree/main
+__use_yte__: true
+__definitions__:
+  - |
+    def inclusive_range_mult(start, stop, mult):
+      result = []
+      while start <= stop:
+        result += [start]
+        start *= mult
+      return result
+
+    def inclusive_range_add(start, stop, step):
+      result = []
+      while start <= stop:
+        result += [round(start, 3)]
+        start += step
+      return result
+
+RAPTOR_BINARY: /srv/data/seiler/hibf_benchmark/raptor
+
+DISPLAY_LAYOUT_BINARY: /srv/data/seiler/hibf_benchmark/display_layout
+FILENAMES_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/1024.filenames
+QUERY_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/reads_e2_250/all.fastq
+BUILD_DIR: /srv/public/seiler/develop/hibf_benchmarks/build
+LOG_DIR: /srv/public/seiler/develop/hibf_benchmarks/logs
+
+PARAMS:
+  ALPHA: [60.0 ,40.0, 20.0, 10.0, 5.0, 2.0, 1.5, 1.3, 1.0, 0.7, 0.5]
+  T_MAX: ?sorted([192, 768, 8192] + inclusive_range_mult(64, 2048, 2))
+  NUM_HASHES: ?inclusive_range_add(2, 15, 1)
+  KMER_SIZE: ?inclusive_range_add(18, 32, 1)
+  RELAXED_FPR: ?[0.05] + inclusive_range_add(0.1, 0.9, 0.1)
+  MODE: [none, U, U+R] # [none, U, U+R]
+
+DATA_PARAMETERS:
+  QUERY_ERRORS: 2
+
+DEFAULT_PARAMS:
+  ALPHA: 1.2
+  T_MAX: 192
+  NUM_HASHES: 2
+  KMER_SIZE: 32
+  R_FPR: 0.5
+  M_FPR: 0.05
+  WINDOW_SIZE: 32
+  MODE: U+R
+
+NUM_THREADS: 1 # Number of threads to use per task, not for parallel execution
+
+TIME_FORMAT:
+  - "KEY"
+  - "SUBKEY"
+  - "wall_clock_time_in_seconds"
+  - "determine_query_length_in_seconds"
+  - "query_file_io_in_seconds"
+  - "load_index_in_seconds"
+  - "compute_minimiser_max_in_seconds"
+  - "query_ibf_max_in_seconds"
+  - "generate_results_max_in_seconds"
+
+SIZE_FORMAT:
+  - "KEY"
+  - "SUBKEY"
+  - "LEVEL"
+  - "BIT_SIZE"
+  - "AVG_LOAD_FACTOR"
+
+KEYS:
+  - "alpha"
+  - "hash"
+  - "kmer"
+  - "relaxed-fpr"
+  - "none"
+  - "U"
+  - "U+R"
