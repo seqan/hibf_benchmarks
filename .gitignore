@@ -8,9 +8,9 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
+scripts/.snakemake/
 downloads/
 eggs/
 .eggs/
@@ -25,6 +25,13 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+data/1024
+build/
+build
+log/
+.snakemake/
+bokeh_plot.html
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

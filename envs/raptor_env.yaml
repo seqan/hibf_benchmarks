@@ -1,0 +1,6 @@
+name: raptor_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - bioconda::raptor

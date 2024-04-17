@@ -1,0 +1,20 @@
+import yaml
+
+
+configfile: "parameters.yaml"
+configfile: "plot_parameters.yaml"
+
+
+# https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+if os.getenv("CI", "false") == "false":
+
+    include: "rules/run_raptor.smk"
+
+
+include: "rules/summarize.smk"
+include: "rules/plot.smk"
+
+
+rule all:
+    input:
+        f"{config['PLOT_FILE']}",

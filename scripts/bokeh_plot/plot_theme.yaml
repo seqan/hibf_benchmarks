@@ -1,0 +1,50 @@
+attrs:
+    figure:
+        background_fill_color: '#20262b'
+        border_fill_color: '#15191c'
+        outline_line_color: null
+
+    Axis:
+        minor_tick_line_color: null
+        major_tick_line_color: null
+        axis_line_color: '#54545c'
+        axis_label_text_font: 'Helvetica'
+        axis_label_text_color: '#E2E2E2'
+        major_label_text_color: '#E2E2E2'
+        major_label_text_font: 'Helvetica'
+        major_label_text_font_size: '1.025em'
+        major_label_text_font_style: 'normal'
+
+    Grid:
+        grid_line_dash: [6, 0]
+        grid_line_alpha: .2
+        grid_line_color: '#54545c'
+
+    Title:
+        text_color: '#E2E2E2'
+        text_font: 'Helvetica'
+        text_font_size: '1.15em'
+
+    Legend:
+        background_fill_alpha: 0.8
+        background_fill_color: '#181c20'
+        label_text_color: '#E2E2E2'
+        label_text_font: 'Helvetica'
+        label_text_font_size: '1.025em'
+        border_line_alpha: 0
+        inactive_fill_color: '#181c20'
+        inactive_fill_alpha: 0.6
+
+    ColorBar:
+        title_text_color: '#E2E2E2'
+        title_text_font: 'Helvetica'
+        title_text_font_size: '1.025em'
+        major_label_text_color: '#E2E2E2'
+        major_label_text_font: 'Helvetica'
+        major_label_text_font_size: '1.025em'
+        background_fill_color: '#2F2F2F'
+        bar_line_color: null
+
+    Plot:
+        toolbar_location: null
+
