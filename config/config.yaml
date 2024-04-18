@@ -17,12 +17,10 @@ __definitions__:
       return result
 
 RAPTOR_BINARY: /srv/data/seiler/hibf_benchmark/raptor
-
 DISPLAY_LAYOUT_BINARY: /srv/data/seiler/hibf_benchmark/display_layout
+
 FILENAMES_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/1024.filenames
 QUERY_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/reads_e2_250/all.fastq
-BUILD_DIR: /srv/public/seiler/develop/hibf_benchmarks/build
-LOG_DIR: /srv/public/seiler/develop/hibf_benchmarks/logs
 
 PARAMS:
   ALPHA: [60.0 ,40.0, 20.0, 10.0, 5.0, 2.0, 1.5, 1.3, 1.0, 0.7, 0.5]
@@ -42,7 +40,6 @@ DEFAULT_PARAMS:
   KMER_SIZE: 32
   R_FPR: 0.5
   M_FPR: 0.05
-  WINDOW_SIZE: 32
   MODE: U+R
 
 NUM_THREADS: 1 # Number of threads to use per task, not for parallel execution

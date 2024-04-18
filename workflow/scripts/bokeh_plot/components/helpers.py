@@ -3,7 +3,7 @@
 
 def convert_list_to_float(data):
     """Returns a list containing the values of the given list as floats."""
-    return [float(i) for i in data]
+    return [float("nan") if float(i) == 0.0 else float(i) for i in data]
 
 
 def convert_list_to_string(data):

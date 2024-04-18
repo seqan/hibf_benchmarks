@@ -1,8 +1,8 @@
 import yaml
 
 
-configfile: "parameters.yaml"
-configfile: "plot_parameters.yaml"
+configfile: "config/config.yaml"
+configfile: "config/plot_config.yaml"
 
 
 # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
@@ -17,4 +17,4 @@ include: "rules/plot.smk"
 
 rule all:
     input:
-        f"{config['PLOT_FILE']}",
+        "results/html/index.html",

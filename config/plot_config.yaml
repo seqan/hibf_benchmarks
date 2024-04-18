@@ -1,6 +1,3 @@
-PLOT_FILE: /srv/public/seiler/develop/hibf_benchmarks/bokeh_plot.html
-THEME: '/srv/public/seiler/develop/hibf_benchmarks/scripts/bokeh_plot/plot_theme.yaml'
-
 KEYS_NAMES:
   - "alpha"
   - "hash"

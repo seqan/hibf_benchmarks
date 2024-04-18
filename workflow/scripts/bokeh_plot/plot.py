@@ -17,10 +17,6 @@ from components.plot_style import add_legend, add_second_y_axis, configure_size_
 
 log_init(snakemake.log[0])
 
-BUILD_DIR = snakemake.config["BUILD_DIR"]
-PLOT_FILE = snakemake.config["PLOT_FILE"]
-THEME = snakemake.config["THEME"]
-
 TIME_FORMAT = snakemake.config["PLOT_TIME_FORMAT"]
 TIME_NAMES = snakemake.config["TIME_NAMES"]
 SIZE_FORMAT = snakemake.config["PLOT_SIZE_FORMAT"]
@@ -63,12 +59,12 @@ def create_size_plot(size_data, y_range, max_result_size, file_name):
 
 def create_plot():
     """Creates the final plot."""
-    output_file(filename=PLOT_FILE, title="HIBF Benchmarks")
-    curdoc().theme = Theme(filename=THEME)
+    output_file(filename="results/html/index.html", title="HIBF Benchmarks")
+    curdoc().theme = Theme(filename="workflow/scripts/bokeh_plot/plot_theme.yaml")
     tabs = []
     for file_name_index, file_name in enumerate(KEYS):
-        with open(os.path.join(BUILD_DIR, "prepared_time", file_name), "r", encoding="utf-8") as timing_file, open(
-            os.path.join(BUILD_DIR, "prepared_size", file_name), "r", encoding="utf-8"
+        with open(os.path.join("results", "prepared_time", file_name), "r", encoding="utf-8") as timing_file, open(
+            os.path.join("results", "prepared_size", file_name), "r", encoding="utf-8"
         ) as size_file:
             time_reader = csv.reader(timing_file, delimiter="\t")
             size_reader = csv.reader(size_file, delimiter="\t")

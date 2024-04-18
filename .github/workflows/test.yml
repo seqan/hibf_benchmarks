@@ -30,24 +30,13 @@ jobs:
           auto-activate-base: false
           auto-update-conda: false
           channel-priority: strict
-          environment-file: envs/snakemake.yml
+          environment-file: workflow/envs/snakemake.yml
           miniforge-version: latest
-
-      - name: Update yaml
-        run: |
-          wget --quiet --output-document yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          chmod +x yq
-          ./yq --inplace '.BUILD_DIR = "${{ github.workspace }}/build"' ${{ github.workspace }}/scripts/parameters.yaml
-          ./yq --inplace '.LOG_DIR = "${{ github.workspace }}/log"' ${{ github.workspace }}/scripts/parameters.yaml
-          ./yq --inplace '.PLOT_FILE = "${{ github.workspace }}/build/html/index.html"' ${{ github.workspace }}/scripts/plot_parameters.yaml
-          ./yq --inplace '.THEME = "${{ github.workspace }}/scripts/bokeh_plot/plot_theme.yaml"' ${{ github.workspace }}/scripts/plot_parameters.yaml
 
       - name: Extract data
         run: |
-          mkdir -p ${{ github.workspace }}/build
-          tar xf ${{ github.workspace }}/data/data.tar.zst -C ${{ github.workspace }}/build
+          mkdir -p ${{ github.workspace }}/results
+          tar xf ${{ github.workspace }}/.github/data/data.tar.zst -C ${{ github.workspace }}/results
 
       - name: Run snakemake
-        run: |
-          cd scripts
-          snakemake --use-conda --cores 2
+        run: snakemake --use-conda --cores 2

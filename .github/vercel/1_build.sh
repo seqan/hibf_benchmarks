@@ -13,15 +13,7 @@ set -x
 
 export WORK_DIR=`pwd`
 
-wget --quiet --output-document yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-chmod +x yq
-./yq --inplace '.BUILD_DIR = strenv(WORK_DIR) + "/build"' ${WORK_DIR}/scripts/parameters.yaml
-./yq --inplace '.LOG_DIR = strenv(WORK_DIR) + "/log"' ${WORK_DIR}/scripts/parameters.yaml
-./yq --inplace '.PLOT_FILE = strenv(WORK_DIR) + "/build/html/index.html"' ${WORK_DIR}/scripts/plot_parameters.yaml
-./yq --inplace '.THEME = strenv(WORK_DIR) + "/scripts/bokeh_plot/plot_theme.yaml"' ${WORK_DIR}/scripts/plot_parameters.yaml
+mkdir -p ${WORK_DIR}/results
+zstd --decompress ${WORK_DIR}/.github/data/data.tar.zst -c | tar xf - -C ${WORK_DIR}/results
 
-mkdir -p ${WORK_DIR}/build
-zstd --decompress ${WORK_DIR}/data/data.tar.zst -c | tar xf - -C ${WORK_DIR}/build
-
-cd scripts
 snakemake --use-conda --cores 2
