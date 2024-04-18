@@ -1,7 +1,19 @@
 """Functions to configure the style of the plots."""
 
 from bokeh import events
-from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis
+from bokeh.models import (
+    AdaptiveTicker,
+    BoxZoomTool,
+    CustomJS,
+    CustomJSTickFormatter,
+    FactorRange,
+    HoverTool,
+    Legend,
+    LinearAxis,
+    PanTool,
+    ResetTool,
+    WheelZoomTool,
+)
 
 
 def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
@@ -18,6 +30,7 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
                     ("Percentage", f"@{key}_percentage{{0.00}}%"),
                 ],
                 renderers=[renderer],
+                visible=False,
             )
         )
     else:
@@ -31,6 +44,7 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
                     ("Load Factor (avg)", f"@{key}_avg_load_factor{{0.00}}"),
                 ],
                 renderers=[renderer],
+                visible=False,
             )
         )
 
@@ -73,14 +87,20 @@ def add_second_y_axis(plot, y_range):
 def configure_time_plot(plot, scale_in_minutes):
     """Configures the time plot."""
     if scale_in_minutes:
-        plot.xaxis.ticker = AdaptiveTicker(base=60, min_interval=60)
+        plot.xaxis.ticker = AdaptiveTicker(base=60)
         plot.xaxis.axis_label = "time in minutes"
         plot.xaxis.formatter = CustomJSTickFormatter(code="return (tick / 60);")
     else:
-        plot.xaxis.ticker = AdaptiveTicker(base=10, min_interval=10)
+        plot.xaxis.ticker = AdaptiveTicker(base=10)
         plot.xaxis.axis_label = "time in seconds"
-    plot.toolbar_location = None
     plot.toolbar.logo = None
+    plot.toolbar_location = "below"
+    plot.toolbar.autohide = True
+    zoom_tool = WheelZoomTool(maintain_focus=False)
+    plot.add_tools(PanTool(), zoom_tool, BoxZoomTool(), ResetTool())
+    plot.toolbar.active_scroll = zoom_tool
+    plot.x_range.bounds = (0, float("inf"))
+
     plot.yaxis.visible = False
     plot.y_range.range_padding = 0.1
     plot.ygrid.grid_line_color = None
@@ -89,12 +109,15 @@ def configure_time_plot(plot, scale_in_minutes):
 
 def configure_size_plot(plot):
     """Configures the size plot."""
-    # custom_labels = replace_keys(plot.y_range.factors)
-    # label_mapping = dict(zip(plot.y_range.factors, custom_labels))
-    # print(label_mapping)
-    # plot.yaxis.major_label_overrides = label_mapping
     plot.toolbar.logo = None
-    plot.toolbar_location = None
+    plot.toolbar.autohide = True
+    plot.toolbar_location = "below"
+    plot.toolbar.autohide = True
+    zoom_tool = WheelZoomTool(maintain_focus=False)
+    plot.add_tools(PanTool(), zoom_tool, BoxZoomTool(), ResetTool())
+    plot.toolbar.active_scroll = zoom_tool
+    plot.x_range.bounds = (0, float("inf"))
+
     plot.y_range.range_padding = 0.1
     plot.ygrid.grid_line_color = None
     plot.axis.minor_tick_line_color = None
