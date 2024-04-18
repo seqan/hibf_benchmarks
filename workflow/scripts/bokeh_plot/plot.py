@@ -12,7 +12,13 @@ from bokeh.themes import Theme
 from components.convert_data import convert_size_data, convert_time_data
 from components.helpers import convert_list_to_string, get_max_result
 from components.log_init import log_init
-from components.plot_css_html import create_latex_text, create_vercel_div, get_global_style, get_tab_style
+from components.plot_css_html import (
+    create_dataset_text,
+    create_latex_text,
+    create_vercel_div,
+    get_global_style,
+    get_tab_style,
+)
 from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot
 
 log_init(snakemake.log[0])
@@ -46,7 +52,7 @@ def create_size_plot(size_data, y_range, max_result_size, file_name):
     plot = figure(
         y_range=y_range,
         x_range=(0, max_result_size),
-        x_axis_label="size in GB",
+        x_axis_label="size in GiB",
         tools="",
     )
     renderers = plot.hbar_stack(SIZE_FORMAT[1:], y=SIZE_FORMAT[0], height=0.4, source=(size_data), color=Set2_4)
@@ -86,9 +92,15 @@ def create_plot():
             vercel_div = create_vercel_div()
             all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
             tabs.append(TabPanel(child=all_elements, title=KEYS_NAMES[file_name_index]))
-    latex_text = create_latex_text()
     tabs.append(
-        TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description")
+        TabPanel(
+            child=Div(text=create_latex_text(), styles={"color": "#d7d7d7", "font-size": "14px"}), title="Parameters"
+        )
+    )
+    tabs.append(
+        TabPanel(
+            child=Div(text=create_dataset_text(), styles={"color": "#d7d7d7", "font-size": "14px"}), title="Dataset"
+        )
     )
     tab_style = get_tab_style()
     global_style = get_global_style()

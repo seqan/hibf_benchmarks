@@ -38,8 +38,8 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
             HoverTool(
                 tooltips=[
                     (file_name, "@value"),
-                    ("Size", "@sizes{0.00}GB"),
-                    (display_key, "@$name{0.00}GB"),
+                    ("Size", "@sizes{0.00}GiB"),
+                    (display_key, "@$name{0.00}GiB"),
                     ("Percentage", f"@{key}_percentage{{0.00}}%"),
                     ("Load Factor (avg)", f"@{key}_avg_load_factor{{0.00}}"),
                 ],
