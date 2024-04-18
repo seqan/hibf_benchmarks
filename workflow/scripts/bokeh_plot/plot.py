@@ -30,7 +30,6 @@ def create_time_plot(time_data, y_range, max_result_time, file_name, scale_in_mi
     plot = figure(
         y_range=y_range,
         x_range=(max_result_time, 0),
-        toolbar_location="left",
         tools="",
     )
     renderers = plot.hbar_stack(
@@ -48,7 +47,6 @@ def create_size_plot(size_data, y_range, max_result_size, file_name):
         y_range=y_range,
         x_range=(0, max_result_size),
         x_axis_label="size in GB",
-        toolbar_location="right",
         tools="",
     )
     renderers = plot.hbar_stack(SIZE_FORMAT[1:], y=SIZE_FORMAT[0], height=0.4, source=(size_data), color=Set2_4)
@@ -82,7 +80,7 @@ def create_plot():
             y_range = size_y_range if len(size_y_range) > len(time_y_range) else time_y_range
 
             plot1 = create_time_plot(time_data, y_range, max_result_time, file_name, scale_in_minutes)
-            plot2 = create_size_plot(size_data, y_range, max_result_size, file_name)
+            plot2 = create_size_plot(size_data, plot1.y_range, max_result_size, file_name)
             both_plots = row(plot1, plot2, sizing_mode="scale_both")
 
             vercel_div = create_vercel_div()
