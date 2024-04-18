@@ -1,0 +1,6 @@
+name: snakemake
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - bioconda::snakemake=8.10.7

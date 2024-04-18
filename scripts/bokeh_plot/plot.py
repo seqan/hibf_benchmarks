@@ -8,6 +8,7 @@ from bokeh.models import Div, TabPanel, Tabs
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save
 from bokeh.themes import Theme
+
 from components.convert_data import convert_size_data, convert_time_data
 from components.helpers import convert_list_to_string, get_max_result
 from components.log_init import log_init
