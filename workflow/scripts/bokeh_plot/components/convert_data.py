@@ -29,5 +29,5 @@ def convert_size_data(data, key, size_format):
             result[size_format[i + 1]], result["sizes"]
         )
     for i, element in enumerate(data[5:]):
-        result[f"{size_format[i+1]}_avg_load_factor"] = element
+        result[f"{size_format[i+1]}_avg_load_factor"] = convert_list_to_float(element)
     return result
