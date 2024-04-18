@@ -32,7 +32,6 @@ command = f"""{snakemake.config['RAPTOR_BINARY']} layout \
             --input {snakemake.config['FILENAMES_FILE']} \
             --output {snakemake.output.LAYOUT_FILE} \
             --kmer {kmer_size} \
-            --window {snakemake.config["DEFAULT_PARAMS"]['WINDOW_SIZE']} \
             --tmax {t_max} \
             --fpr {snakemake.config["DEFAULT_PARAMS"]['M_FPR']} \
             --relaxed-fpr {relaxed_fpr} \

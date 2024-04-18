@@ -32,6 +32,7 @@ build
 log/
 .snakemake/
 bokeh_plot.html
+results
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

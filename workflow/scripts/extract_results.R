@@ -39,7 +39,7 @@ input_size$SUBKEY <- sapply(new_subkeys, function(x) x[2])
 for (key in snakemake@config[["KEYS"]]) {
     time_data <- input_time[input_time$KEY == key, TIME_FORMAT[TIME_FORMAT != "KEY" & TIME_FORMAT != "wall_clock_time_in_seconds"]]
     time_data <- transform_time(time_data)
-    output_time <- file.path(snakemake@config[["BUILD_DIR"]], "prepared_time", key)
+    output_time <- file.path("results", "prepared_time", key)
     if (length(time_data) == 0)
     {
         file.create(output_time)
@@ -51,7 +51,7 @@ for (key in snakemake@config[["KEYS"]]) {
 
     size_data <- input_size[input_size$KEY == key, SIZE_FORMAT[SIZE_FORMAT != "KEY"]]
     size_data <- transform_size(size_data)
-    output_size <- file.path(snakemake@config[["BUILD_DIR"]], "prepared_size", key)
+    output_size <- file.path("results", "prepared_size", key)
     if (length(size_data) == 0)
     {
         file.create(output_size)
