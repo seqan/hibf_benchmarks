@@ -1,4 +1,4 @@
-name: bokeh_env
+name: bokeh
 channels:
   - conda-forge
   - defaults

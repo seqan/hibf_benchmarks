@@ -9,7 +9,7 @@ rule raptor_layout:
     log:
         f"{config['LOG_DIR']}/raptor_layout/{{key}}_{{param}}.log",
     conda:
-        "../../envs/raptor_env.yaml"
+        "../../envs/raptor.yml"
     script:
         "run_layout.py"
 
@@ -25,7 +25,7 @@ rule raptor_build:
     log:
         f"{config['LOG_DIR']}/raptor_build/{{key}}_{{param}}.log",
     conda:
-        "../../envs/raptor_env.yaml"
+        "../../envs/raptor.yml"
     params:
         RAPTOR_BINARY=config["RAPTOR_BINARY"],
         WINDOW_SIZE=config["DEFAULT_PARAMS"]["WINDOW_SIZE"],
@@ -53,7 +53,7 @@ rule raptor_search:
     log:
         f"{config['LOG_DIR']}/raptor_search/{{key}}_{{param}}.log",
     conda:
-        "../../envs/raptor_env.yaml"
+        "../../envs/raptor.yml"
     params:
         RAPTOR_BINARY=config["RAPTOR_BINARY"],
         QUERY_FILE=config["QUERY_FILE"],
@@ -82,7 +82,7 @@ rule display_layout:
     log:
         f"{config['LOG_DIR']}/display_layout/{{key}}_{{param}}.log",
     conda:
-        "../../envs/raptor_env.yaml"
+        "../../envs/raptor.yml"
     params:
         DISPLAY_LAYOUT_BINARY=config["DISPLAY_LAYOUT_BINARY"],
         WINDOW_SIZE=config["DEFAULT_PARAMS"]["WINDOW_SIZE"],

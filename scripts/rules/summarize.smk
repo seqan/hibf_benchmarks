@@ -14,7 +14,7 @@ rule summarize_timings:
     log:
         f"{config['LOG_DIR']}/summarize_timings.log",
     conda:
-        "../../envs/r_basic_env.yaml"
+        "../../envs/r.yml"
     script:
         "../summarize_results.R"
 
@@ -29,6 +29,6 @@ rule summarize_sizes:
     log:
         f"{config['LOG_DIR']}/summarize_sizes.log",
     conda:
-        "../../envs/r_basic_env.yaml"
+        "../../envs/r.yml"
     script:
         "../summarize_results.R"

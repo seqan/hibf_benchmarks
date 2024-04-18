@@ -11,7 +11,7 @@ rule extract_data_for_plot:
     log:
         f"{config['LOG_DIR']}/extract_data_for_plot.log",
     conda:
-        "../../envs/r_basic_env.yaml"
+        "../../envs/r.yml"
     script:
         "../extract_results.R"
 
@@ -28,6 +28,6 @@ rule plot_data:
     log:
         f"{config['LOG_DIR']}/plot_data.log",
     conda:
-        "../../envs/bokeh_env.yaml"
+        "../../envs/bokeh.yml"
     script:
         "../bokeh_plot/plot.py"

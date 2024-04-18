@@ -6,7 +6,7 @@ quiet = true
 [tool.isort]
 profile = "black"
 src_paths = ['(\.pyi?|\.ipynb)$']
-known_first_party = ["shared"]
+known_first_party = ["components"]
 line_length = 120
 quiet = true
 
@@ -15,7 +15,7 @@ recursive = true
 
 [tool.pylint.format]
 max-line-length = 120
-disable = ["line-too-long"]
+disable = ["line-too-long", "import-error"]
 max-locals = 50
 max-statements = 150
 max-args = 7

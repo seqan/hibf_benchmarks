@@ -1,4 +1,4 @@
-name: raptor_env
+name: raptor
 channels:
   - conda-forge
   - defaults

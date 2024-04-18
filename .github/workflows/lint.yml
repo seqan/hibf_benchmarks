@@ -32,11 +32,11 @@ jobs:
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: snakemake
+          activate-environment: lint
           auto-activate-base: false
           auto-update-conda: false
           channel-priority: strict
-          environment-file: environment.yml
+          environment-file: envs/lint.yml
           miniforge-version: latest
 
       - name: Run isort
@@ -81,11 +81,11 @@ jobs:
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: snakemake
+          activate-environment: lint
           auto-activate-base: false
           auto-update-conda: false
           channel-priority: strict
-          environment-file: environment.yml
+          environment-file: envs/lint.yml
           miniforge-version: latest
 
       - name: Run pylint

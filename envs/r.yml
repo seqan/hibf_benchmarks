@@ -1,4 +1,4 @@
-name: r_basic_env
+name: r
 channels:
   - conda-forge
   - defaults
