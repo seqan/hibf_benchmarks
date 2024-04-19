@@ -85,7 +85,7 @@ jobs:
           auto-activate-base: false
           auto-update-conda: false
           channel-priority: strict
-          environment-file: envs/lint.yml
+          environment-file: workflow/envs/lint.yml
           miniforge-version: latest
 
       - name: Run pylint
