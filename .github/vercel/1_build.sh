@@ -4,16 +4,16 @@
 # SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-set -euxo pipefail
+set -euvo pipefail
 
-set +x
-source ~/.bashrc
-conda activate
-set -x
+set +v && source ~/.bashrc && set -v
+set +v && mamba activate snakemake && set -v
 
-export WORK_DIR=`pwd`
+mkdir -p results
+zstd --decompress .github/data/data.tar.zst -c | tar xf - -C results
 
-mkdir -p ${WORK_DIR}/results
-zstd --decompress ${WORK_DIR}/.github/data/data.tar.zst -c | tar xf - -C ${WORK_DIR}/results
-
-snakemake --use-conda --cores 2
+snakemake --use-conda \
+          --conda-frontend mamba \
+          --conda-prefix `pwd`/node_modules/.snakemake \
+          --conda-cleanup-pkgs cache \
+          --cores 4

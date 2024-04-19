@@ -29,9 +29,11 @@ jobs:
           activate-environment: snakemake
           auto-activate-base: false
           auto-update-conda: false
+          channels: conda-forge
           channel-priority: strict
           environment-file: workflow/envs/snakemake.yml
           miniforge-version: latest
+          use-mamba: true
 
       - name: Extract data
         run: |
@@ -39,4 +41,4 @@ jobs:
           tar xf ${{ github.workspace }}/.github/data/data.tar.zst -C ${{ github.workspace }}/results
 
       - name: Run snakemake
-        run: snakemake --use-conda --cores 2
+        run: snakemake --use-conda --conda-frontend mamba --cores 2

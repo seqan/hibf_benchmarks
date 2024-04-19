@@ -4,26 +4,21 @@
 # SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-set -euxo pipefail
+set -euvo pipefail
 
-WORK_DIR=`pwd`
-CACHE_DIR="${WORK_DIR}/node_modules" # The node_modules directory is always cached.
+MF_DIR="`pwd`/node_modules/miniforge"
+MF_FILE="Miniforge3-$(uname)-$(uname -m).sh"
+echo ${MF_DIR}
+echo ${MF_FILE}
 
-mkdir -p ${CACHE_DIR}/miniconda3
-curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o ${CACHE_DIR}/miniconda3/miniconda.sh
-chmod +x ${CACHE_DIR}/miniconda3/miniconda.sh
-${CACHE_DIR}/miniconda3/miniconda.sh -b -u -p ${CACHE_DIR}/miniconda3
-rm -rf ${CACHE_DIR}/miniconda3/miniconda.sh
+curl -LsO "https://github.com/conda-forge/miniforge/releases/latest/download/${MF_FILE}"
+chmod +x ${MF_FILE}
+./${MF_FILE} -b -u -p ${MF_DIR}
+${MF_DIR}/bin/mamba init bash
 
-${CACHE_DIR}/miniconda3/bin/conda init bash
+set +v && source ~/.bashrc && set -v
 
-set +x
-source ~/.bashrc
-set -x
-
-conda config --add channels defaults
-conda config --add channels bioconda
-conda config --add channels conda-forge
+conda config --set default_threads 4
 conda config --set channel_priority strict
-
-conda install --quiet --yes snakemake zstd wget mamba
+mamba env create --yes --file ./workflow/envs/snakemake.yml
+mamba clean --all --yes
