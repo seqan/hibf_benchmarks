@@ -19,8 +19,6 @@ jobs:
     name: Formatting and Style
     runs-on: ubuntu-22.04
     timeout-minutes: 15
-    outputs:
-      has_changes: ${{ steps.commit.outputs.committed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,10 +68,10 @@ jobs:
       # Wait for new commit to start new workflow run such that this run is cancelled.
       # Useful for auto-merge on success of all workflows.
       - name: Wait
-        if: needs.auto-lint.outputs.has_changes == 'true'
+        if: steps.commit.outputs.committed == 'true'
         run: sleep 60
 
       # Otherwise, continue.
       - name: Run pylint
-        if: needs.auto-lint.outputs.has_changes == 'false'
+        if: steps.commit.outputs.committed == 'false'
         run: pylint .
