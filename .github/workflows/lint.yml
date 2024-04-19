@@ -16,7 +16,7 @@ defaults:
 
 jobs:
   auto-lint:
-    name: Formatting
+    name: Formatting and Style
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     outputs:
@@ -35,9 +35,11 @@ jobs:
           activate-environment: lint
           auto-activate-base: false
           auto-update-conda: false
+          channels: conda-forge
           channel-priority: strict
           environment-file: workflow/envs/lint.yml
           miniforge-version: latest
+          use-mamba: true
 
       - name: Run isort
         run: isort .
@@ -65,29 +67,13 @@ jobs:
           author_email: seqan-actions@users.noreply.github.com
           message: '[MISC] automatic linting'
 
-  lint:
-    needs: auto-lint
-    if: needs.auto-lint.outputs.has_changes == 'false'
-    name: Style Guide
-    runs-on: ubuntu-22.04
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
+      # Wait for new commit to start new workflow run such that this run is cancelled.
+      # Useful for auto-merge on success of all workflows.
+      - name: Wait
+        if: needs.auto-lint.outputs.has_changes == 'true'
+        run: sleep 60
 
-      - name: Setup conda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: lint
-          auto-activate-base: false
-          auto-update-conda: false
-          channel-priority: strict
-          environment-file: workflow/envs/lint.yml
-          miniforge-version: latest
-
+      # Otherwise, continue.
       - name: Run pylint
+        if: needs.auto-lint.outputs.has_changes == 'false'
         run: pylint .
-

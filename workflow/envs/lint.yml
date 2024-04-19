@@ -1,7 +1,6 @@
 name: lint
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - black=24.4.0
   - isort=5.13.2
