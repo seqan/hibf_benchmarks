@@ -5,15 +5,15 @@ import csv
 import os
 
 from bokeh.layouts import column, row
-from bokeh.models import Div, TabPanel, Tabs
+from bokeh.models import TabPanel, Tabs
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save
 from bokeh.themes import Theme
 
 from components.convert_data import convert_size_data, convert_time_data
 from components.helpers import convert_list_to_string, get_max_result
-from components.plot_css_html import create_latex_text, create_vercel_div, get_global_style, get_tab_style
-from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot
+from components.plot_css_html import create_vercel_div, get_global_style, get_tab_style
+from components.plot_style import add_legend, add_description_tab, add_second_y_axis, configure_size_plot, configure_time_plot
 
 
 BUILD_DIR = snakemake.params["BUILD_DIR"]
@@ -89,13 +89,9 @@ def create_plot():
             vercel_div = create_vercel_div()
             all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
             tabs.append(TabPanel(child=all_elements, title=KEYS_NAMES[file_name_index]))
-    latex_text = create_latex_text()
-    tabs.append(
-        TabPanel(child=Div(text=latex_text, styles={"color": "white", "font-size": "14px"}), title="Description")
-    )
-    tab_style = get_tab_style()
-    global_style = get_global_style()
-    save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[tab_style, global_style]))
+    add_description_tab(tabs)
+
+    save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[get_tab_style(), get_global_style()]))
 
 create_plot()
 print("Plot created successfully.")

@@ -103,3 +103,64 @@ def get_global_style():
         body { background: #15191c; }
         div { max-height: 96vh; max-width: 100vw; }
         """
+
+# def get_hover_code():
+#     return """
+#         console.log('Current state before toggle:', sessionStorage.getItem('both_active'));
+#         var current_state = sessionStorage.getItem('both_active') || 'true';
+#         var new_state = current_state === 'true' ? 'false' : 'true';
+#         sessionStorage.setItem('both_active', new_state);
+#         console.log('New state after toggle:', sessionStorage.getItem('both_active'));
+
+#         var toggle_to_advanced = current_state === 'true';
+#         console.log('Toggle to advanced:', toggle_to_advanced);
+
+#         function updateHoverDescriptions(hovers, normalDescs, advancedDescs) {
+#             hovers.forEach(function(hover, index) {
+#                 if (index < normalDescs.length && index < advancedDescs.length) {
+#                     console.log('Updating hover', index);
+#                     hover.tooltips = toggle_to_advanced ? advancedDescs[index] : normalDescs[index];
+#                 }
+#             });
+#         }
+
+#         updateHoverDescriptions(plot1_hovers, hover1_desc1, hover1_desc2);
+#         updateHoverDescriptions(plot2_hovers, hover2_desc1, hover2_desc2);
+#         console.log(plot1_hovers);
+#         console.log(plot2_hovers);
+#     """
+
+def get_hover_code():
+    return """
+        console.log('Current state before toggle:', sessionStorage.getItem('both_active'));
+        var current_state = sessionStorage.getItem('both_active') || 'true';
+        var desc1, desc2;
+        if (current_state === 'true') {
+            desc1 = hover1_desc2;
+            desc2 = hover2_desc2;
+            sessionStorage.setItem('both_active', 'false');  // Zustand wechseln
+        } else {
+            desc1 = hover1_desc1;  // normale Description für Plot 1
+            desc2 = hover2_desc1;  // normale Description für Plot 2
+            sessionStorage.setItem('both_active', 'true');  // Zustand zurücksetzen
+        }
+
+        console.log('plot1_hovers:', plot1_hovers);
+
+        for (var i = 0; i < plot1_hovers.length; i++) {
+            console.log('Updating hover', i, 'to', desc1[i]);
+            plot1_hovers[i].tooltips = desc1[i];
+        }
+        for (var i = 0; i < plot2_hovers.length; i++) {
+            console.log('Updating hover', i, 'to', desc2[i]);
+            plot2_hovers[i].tooltips = desc2[i];
+        }
+
+        console.log('New state after toggle:', sessionStorage.getItem('both_active'));
+        console.log(plot1_hovers);
+        console.log(plot2_hovers);
+
+        // save changes
+        plot1_hovers = plot1_hovers;
+        plot2_hovers = plot2_hovers;
+        """

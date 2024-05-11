@@ -3,7 +3,7 @@ RAPTOR_BINARY: /srv/data/seiler/hibf_benchmark/raptor
 DISPLAY_LAYOUT_BINARY: /srv/data/seiler/hibf_benchmark/display_layout
 FILENAMES_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/1024.filenames
 QUERY_FILE: /srv/public/leonard/hibf_benchmarks/data/1024/reads_e2_250/all.fastq
-BUILD_DIR: /srv/public/leonard/hibf_benchmarks/build
+BUILD_DIR: /srv/data/leonard/build
 LOG_DIR: /srv/public/leonard/hibf_benchmarks/logs
 
 PARAMS:

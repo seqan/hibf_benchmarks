@@ -1,49 +1,66 @@
 """Functions to configure the style of the plots."""
 
 from bokeh import events
-from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis
+from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis, TabPanel, Div, Toggle
+from bokeh.layouts import column
 
+from components.plot_css_html import create_latex_text, get_hover_code
 
-def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
+time_plot_hovers = []
+size_plot_hovers = []
+
+normal_time_description_list = []
+advanced_time_description_list = []
+normal_size_description_list = []
+advanced_size_description_list = []
+
+def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection):
     """Adds a hover tool to the plot."""
     if file_name in ("none", "U", "U+R"):
         file_name = "tmax"
-    if format_kind == "TIME_FORMAT":
-        plot.add_tools(
-            HoverTool(
-                tooltips=[
-                    (file_name, "@value"),
-                    ("Wall clock time", "@all_times{0.00} sek"),
-                    (display_key, "@$name{0.00} sek"),
-                    ("Percentage", f"@{key}_percentage{{0.00}}%"),
-                ],
-                renderers=[renderer],
-            )
-        )
+    if format_selection == "TIME_FORMAT":
+        normal_time_description = [
+            (file_name, "@value"),
+            ("Wall clock time", "@all_times{0.00} sek"),
+            (display_key, "@$name{0.00} sek"),
+            ("Percentage", f"@{key}_percentage{{0.00}}%"),]
+        advanced_time_description = [
+            (file_name, "@value"),
+            ("Wall clock time", "@all_times{0.00} sek"),
+            (display_key, "@$name{0.00} sek"),
+            ("Percentage", f"@{key}_percentage{{0.00}}%"),
+            ("advanced", "advanced"),]
+        normal_time_description_list.append(normal_time_description)
+        advanced_time_description_list.append(advanced_time_description)
+        plot.add_tools(HoverTool(tooltips=normal_time_description, renderers=[renderer]))
+        time_plot_hovers.append(HoverTool(tooltips=normal_time_description, renderers=[renderer]))
     else:
-        plot.add_tools(
-            HoverTool(
-                tooltips=[
-                    (file_name, "@value"),
-                    ("Size", "@sizes{0.00}GB"),
-                    (display_key, "@$name{0.00}GB"),
-                    ("Percentage", f"@{key}_percentage{{0.00}}%"),
-                    ("Load Factor (avg)", f"@{key}_avg_load_factor{{0.00}}"),
-                ],
-                renderers=[renderer],
-            )
-        )
+        normal_size_description = [
+            (file_name, "@value"),
+            ("Size", "@sizes{0.00}GB"),
+            (display_key, "@$name{0.00}GB"),
+            ("Percentage", f"@{key}_percentage{{0.00}}%"),]
+        advanced_size_description = [
+            (file_name, "@value"),
+            ("Size", "@sizes{0.00}GB"),
+            (display_key, "@$name{0.00}GB"),
+            ("Percentage", f"@{key}_percentage{{0.00}}%"),
+            ("Load Factor (avg)", f"@{key}_avg_load_factor{{0.00}}"),
+            ("advanced", "advanced"),]
+        normal_size_description_list.append(normal_size_description)
+        advanced_size_description_list.append(advanced_size_description)
+        plot.add_tools(HoverTool(tooltips=normal_size_description, renderers=[renderer]))
+        size_plot_hovers.append(HoverTool(tooltips=normal_size_description, renderers=[renderer]))
 
-
-def add_legend(plot, renderers, file_name, time_names, size_names, format_kind, location):
+def add_legend(plot, renderers, file_name, time_names, size_names, format_selection, location):
     """Adds a legend to the plot."""
-    key_format = time_names if format_kind == "TIME_FORMAT" else size_names
+    key_format = time_names if format_selection == "TIME_FORMAT" else size_names
     legend_items = []
     for i, renderer in enumerate(renderers):
         display_key = key_format[i]
         key = renderer.name
         legend_items.append((display_key, [renderer]))
-        add_hover_tool(plot, renderer, key, display_key, file_name, format_kind)
+        add_hover_tool(plot, renderer, key, display_key, file_name, format_selection)
     legend = Legend(items=legend_items)
     legend.location = "left"
     legend.orientation = "vertical"
@@ -89,10 +106,6 @@ def configure_time_plot(plot, scale_in_minutes):
 
 def configure_size_plot(plot):
     """Configures the size plot."""
-    # custom_labels = replace_keys(plot.y_range.factors)
-    # label_mapping = dict(zip(plot.y_range.factors, custom_labels))
-    # print(label_mapping)
-    # plot.yaxis.major_label_overrides = label_mapping
     plot.toolbar.logo = None
     plot.toolbar_location = None
     plot.y_range.range_padding = 0.1
@@ -104,3 +117,18 @@ def configure_size_plot(plot):
     plot.yaxis.minor_tick_line_color = None
     plot.yaxis.major_label_standoff = 15
     plot.sizing_mode = "scale_both"
+
+
+def add_description_tab(tabs):
+    latex_text = create_latex_text()
+    hover_code = get_hover_code()
+    div = Div(text=latex_text, styles={"color": "white", "font-size": "14px"})
+    toggle_button = Toggle(label='Toggle Hover Description', button_type='success', active=True)
+    toggle_button.js_on_click(CustomJS(args=dict(plot1_hovers=time_plot_hovers,
+            hover1_desc1=normal_time_description_list,
+            hover1_desc2=advanced_time_description_list,
+            plot2_hovers=size_plot_hovers,
+            hover2_desc1=normal_size_description_list,
+            hover2_desc2=advanced_size_description_list),
+        code=hover_code))
+    tabs.append(TabPanel(child=column(div, toggle_button), title="Description"))
