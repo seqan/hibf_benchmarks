@@ -1,7 +1,8 @@
-name: bokeh_env
+name: bokeh
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - bokeh=3.4.1
-
+  - python
+  - bokeh
+  - pandas

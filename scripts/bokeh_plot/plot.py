@@ -1,8 +1,9 @@
 from components.log_init import log_init
-log_init(snakemake.log[0])
+log_init(snakemake.log[0]) # type: ignore
 
 import csv
 import os
+import pandas as pd
 
 from bokeh.layouts import column, row
 from bokeh.models import TabPanel, Tabs
@@ -10,37 +11,41 @@ from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save
 from bokeh.themes import Theme
 
-from components.convert_data import convert_size_data, convert_time_data
-from components.helpers import convert_list_to_string, get_max_result
+from components.convert_data import prepare_time_data, prepare_size_data
+from components.helpers import convert_dic_to_list
 from components.plot_css_html import create_vercel_div, get_global_style, get_tab_style
 from components.plot_style import add_legend, add_description_tab, add_second_y_axis, configure_size_plot, configure_time_plot
 
+SIZE_INPUT = snakemake.input["SIZE_INPUT"] # type: ignore
+TIME_INPUT = snakemake.input["TIME_INPUT"] # type: ignore
 
-BUILD_DIR = snakemake.params["BUILD_DIR"]
-PLOT_FILE = snakemake.params["PLOT_FILE"]
-THEME = snakemake.params["THEME"]
+PLOT_FILE = snakemake.output["PLOT_FILE"] # type: ignore
 
-TIME_FORMAT = snakemake.params["TIME_FORMAT"]
-TIME_NAMES = snakemake.params["TIME_NAMES"]
-SIZE_FORMAT = snakemake.params["SIZE_FORMAT"]
-SIZE_NAMES = snakemake.params["SIZE_NAMES"]
-KEYS_FORMAT = snakemake.params["KEYS_FORMAT"]
-KEYS_NAMES = snakemake.params["KEYS_NAMES"]
+THEME = snakemake.params["THEME"] # type: ignore
+KEYS = snakemake.params["KEYS"] # type: ignore
+TIME = snakemake.params["TIME"] # type: ignore
+SIZE = snakemake.params["SIZE"] # type: ignore
 
+TIME_NAMES = [TIME["NAMES"].get(key, key) for key in TIME["FORMAT"]]
+SIZE_NAMES = [SIZE["NAMES"].get(key, key) for key in SIZE["FORMAT"]]
 
-def create_time_plot(time_data, y_range, max_result_time, file_name, scale_in_minutes):
+def create_time_plot(data, y_range, x_range, file_name):
     """Creates the time plot."""
     plot = figure(
         y_range=y_range,
-        x_range=(max_result_time, 0),
+        x_range=(x_range, 0),
         toolbar_location="left",
         tools="",
     )
     renderers = plot.hbar_stack(
-        stackers=TIME_FORMAT[1:], y=TIME_FORMAT[0], height=0.4, source=(time_data), color=Set2_6
+        stackers=TIME["FORMAT"],
+        y=("SUBKEY"),
+        height=0.4,
+        source=(data),
+        color=Set2_6
     )
     add_legend(plot, renderers, file_name, TIME_NAMES, SIZE_NAMES, "TIME_FORMAT", "left")
-    configure_time_plot(plot, scale_in_minutes)
+    configure_time_plot(plot, x_range > 120)
     add_second_y_axis(plot, y_range)
     return plot
 
@@ -54,7 +59,13 @@ def create_size_plot(size_data, y_range, max_result_size, file_name):
         toolbar_location="right",
         tools="",
     )
-    renderers = plot.hbar_stack(SIZE_FORMAT[1:], y=SIZE_FORMAT[0], height=0.4, source=(size_data), color=Set2_4)
+    renderers = plot.hbar_stack(
+        stackers=SIZE["FORMAT"],
+        y=("SUBKEY"),
+        height=0.4,
+        source=(size_data),
+        color=Set2_4
+    )
     configure_size_plot(plot)
     add_legend(plot, renderers, file_name, TIME_NAMES, SIZE_NAMES, "SIZE_FORMAT", "right")
     return plot
@@ -65,30 +76,26 @@ def create_plot():
     output_file(filename=PLOT_FILE, title="HIBF Benchmarks")
     curdoc().theme = Theme(filename=THEME)
     tabs = []
-    for file_name_index, file_name in enumerate(KEYS_FORMAT):
-        with open(os.path.join(BUILD_DIR, "prepared_time", file_name), "r", encoding="utf-8") as timing_file, open(
-            os.path.join(BUILD_DIR, "prepared_size", file_name), "r", encoding="utf-8"
-        ) as size_file:
-            time_reader = csv.reader(timing_file, delimiter="\t")
-            size_reader = csv.reader(size_file, delimiter="\t")
-            time_data_list, size_data_list = list(time_reader), list(size_reader)
-            time_data = convert_time_data(time_data_list, file_name, TIME_FORMAT)
-            size_data = convert_size_data(size_data_list, file_name, SIZE_FORMAT)
-            max_result_time = get_max_result(time_data_list[1:], 1.01)
-            max_result_size = get_max_result(size_data_list[1:5], 1.01)
-            scale_in_minutes = max_result_time > 120
+    with open(SIZE_INPUT, "r", encoding="utf-8") as size_file, open(TIME_INPUT, "r", encoding="utf-8") as timing_file:
+        time_data = pd.read_csv(timing_file, delimiter="\t")
+        size_data = pd.read_csv(size_file, delimiter="\t")
+    for key in KEYS.keys():
+        time_dic = prepare_time_data(time_data, (key, KEYS[key]), TIME["NAMES"])
+        size_dic = prepare_size_data(size_data, (key, KEYS[key]), SIZE["NAMES"])
+        time_x_range = round(max(time_dic["wall_clock_time_in_seconds"]) * 1.05, 3)
+        size_x_range = round(max(size_dic["GB_TOTAL_SIZE"]) * 1.05, 3)
 
-            size_y_range = convert_list_to_string(size_data["SUBKEY"])
-            time_y_range = convert_list_to_string(time_data["SUBKEY"])
-            y_range = size_y_range if len(size_y_range) > len(time_y_range) else time_y_range
+        size_y_range = convert_dic_to_list(size_dic["SUBKEY"])
+        time_y_range = convert_dic_to_list(time_dic["SUBKEY"])
+        y_range = size_y_range if len(size_y_range) > len(time_y_range) else time_y_range
 
-            plot1 = create_time_plot(time_data, y_range, max_result_time, file_name, scale_in_minutes)
-            plot2 = create_size_plot(size_data, y_range, max_result_size, file_name)
-            both_plots = row(plot1, plot2, sizing_mode="scale_both")
+        plot1 = create_time_plot(time_dic, y_range, time_x_range, key)
+        plot2 = create_size_plot(size_dic, y_range, size_x_range, key)
+        both_plots = row(plot1, plot2, sizing_mode="scale_both")
 
-            vercel_div = create_vercel_div()
-            all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
-            tabs.append(TabPanel(child=all_elements, title=KEYS_NAMES[file_name_index]))
+        vercel_div = create_vercel_div()
+        all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
+        tabs.append(TabPanel(child=all_elements, title=KEYS[key]))
     add_description_tab(tabs)
 
     save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[get_tab_style(), get_global_style()]))

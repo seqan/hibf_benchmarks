@@ -17,4 +17,6 @@ include: "rules/plot.smk"
 
 rule all:
     input:
+        # "/srv/data/leonard/build/size",
+        # "/srv/data/leonard/build/time",
         f"{plot_config['PLOT_FILE']}",

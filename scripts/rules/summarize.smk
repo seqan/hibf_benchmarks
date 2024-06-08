@@ -12,8 +12,6 @@ rule summerize_timings:
         ),
     output:
         OUTPUT_FILE = f"{config['BUILD_DIR']}/time",
-    params:
-        FORMAT = config['TIME_FORMAT'],
     log:
         f"{config['LOG_DIR']}/summerize_timings.log",
     conda:
@@ -38,8 +36,6 @@ rule summerize_sizes:
         ),
     output:
         OUTPUT_FILE=f"{config['BUILD_DIR']}/size",
-    params:
-        FORMAT=config['SIZE_FORMAT'],
     log:
         f"{config['LOG_DIR']}/summerize_sizes.log",
     conda:

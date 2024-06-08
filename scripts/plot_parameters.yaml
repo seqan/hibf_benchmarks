@@ -1,50 +1,150 @@
 PLOT_FILE: /srv/public/leonard/hibf_benchmarks/bokeh_plot.html
 THEME: '/srv/public/leonard/hibf_benchmarks/scripts/bokeh_plot/plot_theme.yaml'
 
-KEYS_FORMAT:
-  - "alpha"
-  - "hash"
-  - "kmer"
-  - "relaxed-fpr"
-  - "none"
-  - "U"
-  - "U+R"
 
-KEYS_NAMES:
-  - "alpha"
-  - "hash"
-  - "k-mer"
-  - "relaxed-fpr"
-  - "no U no R"
-  - "U"
-  - "U and R"
+KEYS:
+  alpha: alpha
+  hash: hash
+  kmer: k-mer
+  relaxed-fpr: relaxed-fpr
+  none: "no U no R"
+  U: U
+  U+R: "U and R"
 
-TIME_FORMAT:
-  - "SUBKEY"
-  - "determine_query_length_in_seconds"
-  - "query_file_io_in_seconds"
-  - "load_index_in_seconds"
-  - "compute_minimiser_max_in_seconds"
-  - "query_ibf_max_in_seconds"
-  - "generate_results_max_in_seconds"
+TIME:
+  FORMAT:
+    - determine_query_length_in_seconds
+    - query_file_io_in_seconds
+    - load_index_in_seconds
+    - compute_minimiser_max_in_seconds
+    - query_ibf_max_in_seconds
+    - generate_results_max_in_seconds
+  NAMES:
+    SUBKEY_VALUE: "Subkey"
+    determine_query_length_in_seconds: "Determine query length"
+    determine_query_length_percentage: "Determine query length percentage"
+    query_file_io_in_seconds: "Queryfile IO"
+    query_file_io_percentage: "Queryfile IO percentage"
+    load_index_in_seconds: "Load index"
+    load_index_percentage: "Load index percentage"
+    compute_minimiser_avg_in_seconds: "Compute minimizer (avg)"
+    compute_minimiser_max_percentage: "Compute minimizer (max) percentage"
+    compute_minimiser_max_in_seconds: "Compute minimizer (max)"
+    compute_minimiser_max_percentage: "Compute minimizer (max) percentage"
+    query_ibf_avg_in_seconds: "Query IBF (avg)"
+    query_ibf_max_percentage: "Query IBF (max) percentage"
+    query_ibf_max_in_seconds: "Query IBF (max)"
+    query_ibf_max_percentage: "Query IBF (max) percentage"
+    generate_results_avg_in_seconds: "Generate results (avg)"
+    generate_results_max_percentage: "Generate results (max) percentage"
+    generate_results_max_in_seconds: "Generate results (max)"
+    generate_results_max_percentage: "Generate results (max) percentage"
 
-TIME_NAMES:
-  - "Determine query length"
-  - "Queryfile IO"
-  - "Load index"
-  - "Compute minimizer (max)"
-  - "Query IBF (max)"
-  - "Generate results (max)"
 
-SIZE_FORMAT:
-  - "SUBKEY"
-  - "LEVEL_0"
-  - "LEVEL_1"
-  - "LEVEL_2"
-  - "LEVEL_3"
+SIZE:
+  FORMAT:
+    - LEVEL_0_GB_SIZE
+    - LEVEL_1_GB_SIZE
+    - LEVEL_2_GB_SIZE
+    - LEVEL_3_GB_SIZE
+  NAMES:
+    SUBKEY_VALUE: "Subkey"
+    LEVEL_0_GB_SIZE: "Level 0"
+    LEVEL_1_GB_SIZE: "Level 1"
+    LEVEL_2_GB_SIZE: "Level 2"
+    LEVEL_3_GB_SIZE: "Level 3"
+    LEVEL_0_AVG_LOAD_FACTOR: "Level 0: Avg load factor"
+    LEVEL_1_AVG_LOAD_FACTOR: "Level 1: Avg load factor"
+    LEVEL_2_AVG_LOAD_FACTOR: "Level 2: Avg load factor"
+    LEVEL_3_AVG_LOAD_FACTOR: "Level 3: Avg load factor"
+    GB_TOTAL_SIZE: "Total size"
 
-SIZE_NAMES:
-  - "Level 0"
-  - "Level 1"
-  - "Level 2"
-  - "Level 3"
+# SIZE:
+#   FORMAT:
+#     LEVEL_0: "Level 0"
+#     LEVEL_1: "Level 1"
+#     LEVEL_2: "Level 2"
+#     LEVEL_3: "Level 3"
+#   HOVER:
+#     SUBKEY_VALUE: "SUBKEY_VALUE"
+#     SIZE: "Size"
+#     # LEVEL_0_BITSIZE: "Level 0 size"
+#     # LEVEL_1_BITSIZE: "Level 1 size"
+#     # LEVEL_2_BITSIZE: "Level 2 size"
+#     # LEVEL_3_BITSIZE: "Level 3 size"
+#   ADVANCED_HOVER:
+#     SUBKEY_VALUE: "SUBKEY_VALUE"
+#     SIZE: "Size"
+#     AVG_LOAD_FACTOR: "Avg load factor"
+#     # LEVEL_0_BIT_SIZE: "Level 0 size"
+#     # LEVEL_1_BIT_SIZE: "Level 1 size"
+#     # LEVEL_2_BIT_SIZE: "Level 2 size"
+#     # LEVEL_3_BIT_SIZE: "Level 3 size"
+#     # LEVEL_0_AVG_LOAD_FACTOR: "Level 0 avg load factor"
+#     # LEVEL_1_AVG_LOAD_FACTOR: "Level 1 avg load factor"
+#     # LEVEL_2_AVG_LOAD_FACTOR: "Level 2 avg load factor"
+#     # LEVEL_3_AVG_LOAD_FACTOR: "Level 3 avg load factor"
+
+# KEYS_FORMAT:
+#   - "alpha"
+#   - "hash"
+#   - "kmer"
+#   - "relaxed-fpr"
+#   - "none"
+#   - "U"
+#   - "U+R"
+
+# KEYS_NAMES:
+#   - "alpha"
+#   - "hash"
+#   - "k-mer"
+#   - "relaxed-fpr"
+#   - "no U no R"
+#   - "U"
+#   - "U and R"
+
+# TIME_FORMAT:
+#   - "SUBKEY"
+#   - "determine_query_length_in_seconds"
+#   - "query_file_io_in_seconds"
+#   - "load_index_in_seconds"
+#   - "compute_minimiser_max_in_seconds"
+#   - "query_ibf_max_in_seconds"
+#   - "generate_results_max_in_seconds"
+
+# TIME_NAMES:
+#   - "Determine query length"
+#   - "Queryfile IO"
+#   - "Load index"
+#   - "Compute minimizer (max)"
+#   - "Query IBF (max)"
+#   - "Generate results (max)"
+
+# TIME_HOVER:
+#   - "Determine query length"
+#   - "Queryfile IO"
+#   - "Load index"
+#   - "Compute minimizer (max)"
+#   - "Query IBF (max)"
+#   - "Generate results (max)"
+
+# TIME_HOVER_ADVANCED:
+#   - "Determine query length"
+#   - "Queryfile IO"
+#   - "Load index"
+#   - "Compute minimizer (max)"
+#   - "Query IBF (max)"
+#   - "Generate results (max)"
+
+# SIZE_FORMAT:
+#   - "SUBKEY"
+#   - "LEVEL_0"
+#   - "LEVEL_1"
+#   - "LEVEL_2"
+#   - "LEVEL_3"
+
+# SIZE_NAMES:
+#   - "Level 0"
+#   - "Level 1"
+#   - "Level 2"
+#   - "Level 3"

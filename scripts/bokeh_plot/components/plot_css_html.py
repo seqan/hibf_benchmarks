@@ -97,6 +97,21 @@ def get_tab_style():
         """
 
 
+def get_button_style():
+    """Returns the CSS style for the toggle button."""
+    return """ 
+        <style>
+        .bk-bs-btn-success {
+            background-color: #ff0000;
+            color: black;
+            border: 1px solid #d0d0d0;
+        }
+        .bk-bs-btn-success:focus {
+            outline: none;
+        }
+    </style>
+    """
+
 def get_global_style():
     """Returns the global CSS style."""
     return """
@@ -104,31 +119,6 @@ def get_global_style():
         div { max-height: 96vh; max-width: 100vw; }
         """
 
-# def get_hover_code():
-#     return """
-#         console.log('Current state before toggle:', sessionStorage.getItem('both_active'));
-#         var current_state = sessionStorage.getItem('both_active') || 'true';
-#         var new_state = current_state === 'true' ? 'false' : 'true';
-#         sessionStorage.setItem('both_active', new_state);
-#         console.log('New state after toggle:', sessionStorage.getItem('both_active'));
-
-#         var toggle_to_advanced = current_state === 'true';
-#         console.log('Toggle to advanced:', toggle_to_advanced);
-
-#         function updateHoverDescriptions(hovers, normalDescs, advancedDescs) {
-#             hovers.forEach(function(hover, index) {
-#                 if (index < normalDescs.length && index < advancedDescs.length) {
-#                     console.log('Updating hover', index);
-#                     hover.tooltips = toggle_to_advanced ? advancedDescs[index] : normalDescs[index];
-#                 }
-#             });
-#         }
-
-#         updateHoverDescriptions(plot1_hovers, hover1_desc1, hover1_desc2);
-#         updateHoverDescriptions(plot2_hovers, hover2_desc1, hover2_desc2);
-#         console.log(plot1_hovers);
-#         console.log(plot2_hovers);
-#     """
 
 def get_hover_code():
     return """

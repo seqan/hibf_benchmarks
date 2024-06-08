@@ -1,8 +1,9 @@
 from bokeh import events
-from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis, TabPanel, Div, Toggle
+from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis, TabPanel, Div, Button
 from bokeh.layouts import column
+from bokeh.io import curdoc
 
-from components.plot_css_html import create_latex_text, get_hover_code
+from components.plot_css_html import create_latex_text, get_hover_code, get_button_style
 
 # Listen zur Speicherung der HoverTools und Beschreibungen
 time_plot_hovers = []
@@ -17,11 +18,13 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection
     if file_name in ("none", "U", "U+R"):
         file_name = "tmax"
     if format_selection == "TIME_FORMAT":
+        percentage_name = key.replace("in_seconds", "percentage")
+        print(percentage_name)
         normal_time_description = [
-            (file_name, "@value"),
-            ("Wall clock time", "@all_times{0.00} sek"),
+            (file_name, "@SUBKEY_VALUE"),
+            ("Wall clock time", "@wall_clock_time_in_seconds{0.00} sek"),
             (display_key, "@$name{0.00} sek"),
-            ("Percentage", f"@{key}_percentage{{0.00}}%"),
+            ("Percentage", f"@{percentage_name}{{0.00}}%"),
         ]
         advanced_time_description = normal_time_description + [("advanced", "advanced")]
         normal_time_description_list.append(normal_time_description)
@@ -30,14 +33,15 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection
         plot.add_tools(hover_tool)
         time_plot_hovers.append(hover_tool)
     else:
+        percentage_name = key.replace("GB_SIZE", "GB_SIZE_percentage")
         normal_size_description = [
-            (file_name, "@value"),
-            ("Size", "@sizes{0.00}GB"),
+            (file_name, "@SUBKEY_VALUE"),
+            ("Total size", "@GB_TOTAL_SIZE{0.00}GB"),
             (display_key, "@$name{0.00}GB"),
-            ("Percentage", f"@{key}_percentage{{0.00}}%"),
+            ("Percentage", f"@{percentage_name}{{0.00}}%"),
         ]
         advanced_size_description = normal_size_description + [
-            ("Load Factor (avg)", f"@{key}_avg_load_factor{{0.00}}"),
+            ("Load Factor (avg)", f"@$(name)_avg_load_factor{{0.00}}"),
             ("advanced", "advanced"),
         ]
         normal_size_description_list.append(normal_size_description)
@@ -112,8 +116,9 @@ def configure_size_plot(plot):
 def add_description_tab(tabs):
     latex_text = create_latex_text()
     hover_code = get_hover_code()
-    div = Div(text=latex_text, styles={"color": "white", "font-size": "14px"})
-    toggle_button = Toggle(label='Toggle Hover Description', button_type='success', active=True)
+    text_div = Div(text=latex_text, styles={"color": "white", "font-size": "14px"})
+    toggle_button = Button(label='Toggle Hover Description', button_type='success')
+    style_div = Div(text=get_button_style())
     toggle_button.js_on_click(CustomJS(args=dict(
         plot1_hovers=time_plot_hovers,
         hover1_desc1=normal_time_description_list,
@@ -122,5 +127,5 @@ def add_description_tab(tabs):
         hover2_desc1=normal_size_description_list,
         hover2_desc2=advanced_size_description_list),
         code=hover_code))
-    tabs.append(TabPanel(child=column(div, toggle_button), title="Description"))
+    tabs.append(TabPanel(child=column(style_div, text_div, toggle_button), title="Description"))
 
