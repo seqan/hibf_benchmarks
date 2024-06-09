@@ -1,7 +1,6 @@
 from bokeh import events
-from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis, TabPanel, Div, Button
+from bokeh.models import AdaptiveTicker, CustomJS, CustomJSTickFormatter, FactorRange, HoverTool, Legend, LinearAxis, TabPanel, Div, Toggle
 from bokeh.layouts import column
-from bokeh.io import curdoc
 
 from components.plot_css_html import create_latex_text, get_hover_code, get_button_style
 
@@ -120,11 +119,8 @@ def configure_size_plot(plot):
     plot.sizing_mode = "scale_both"
 
 def add_description_tab(tabs):
-    latex_text = create_latex_text()
-    hover_code = get_hover_code()
-    text_div = Div(text=latex_text, styles={"color": "white", "font-size": "14px"})
-    toggle_button = Button(label='Toggle Hover Description', button_type='success')
-    style_div = Div(text=get_button_style())
+    text_div = Div(text=create_latex_text(), styles={"color": "white", "font-size": "14px"})
+    toggle_button = Toggle(label='Advanced Mode', button_type='success', stylesheets=get_button_style())
     toggle_button.js_on_click(CustomJS(args=dict(
         plot1_hovers=time_plot_hovers,
         hover1_desc1=normal_time_description_list,
@@ -132,6 +128,6 @@ def add_description_tab(tabs):
         plot2_hovers=size_plot_hovers,
         hover2_desc1=normal_size_description_list,
         hover2_desc2=advanced_size_description_list),
-        code=hover_code))
-    tabs.append(TabPanel(child=column(style_div, text_div, toggle_button), title="Description"))
+        code=get_hover_code()))
+    tabs.append(TabPanel(child=column(text_div, toggle_button), title="Description"))
 

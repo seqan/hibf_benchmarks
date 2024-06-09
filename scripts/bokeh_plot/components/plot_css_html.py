@@ -99,18 +99,24 @@ def get_tab_style():
 
 def get_button_style():
     """Returns the CSS style for the toggle button."""
-    return """ 
-        <style>
-        .bk-bs-btn-success {
-            background-color: #ff0000;
-            color: black;
-            border: 1px solid #d0d0d0;
-        }
-        .bk-bs-btn-success:focus {
+    return [r"""
+        .bk-btn, .bk-btn-success, .bk-btn:hover, .bk-btn:active, .bk-btn:focus {
+            background: #15191c;
+            border: solid 1px #777777;
+            color: #777777;
+            cursor: pointer;
             outline: none;
+            box-shadow: none;
         }
-    </style>
-    """
+        .bk-btn.bk-btn-success.bk-active {
+            background: #212427;
+            color: #888888;
+            border: solid 1px #777777;
+        }
+        .bk-btn:hover, .bk-btn.bk-btn-success.bk-active:hover {
+            border: solid 1px #888888;
+        }
+    """]
 
 def get_global_style():
     """Returns the global CSS style."""
