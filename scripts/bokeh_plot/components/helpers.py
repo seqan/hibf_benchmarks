@@ -1,6 +1,5 @@
 """Helper functions."""
 
-
 def convert_dic_to_list(data):
     """Returns a list containing the values of the given list as strings."""
     return [str(i) for i in data]

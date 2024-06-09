@@ -16,7 +16,7 @@ def prepare_time_data(time_data_list, keypair, timepairs):
     export = data.to_dict(orient="list")
     return export
 
-# include yaml names and keys
+
 def prepare_size_data(size_data, keypair, sizepairs):
     """Returns a dictionary containing the given data in the format for the size plot."""
     key, keyname = keypair

@@ -118,6 +118,7 @@ def get_button_style():
         }
     """]
 
+
 def get_global_style():
     """Returns the global CSS style."""
     return """
