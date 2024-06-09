@@ -1,8 +1,3 @@
-"""Functions to convert the data for the plots."""
-
-from components.helpers import convert_list_to_float, devide_arrays_in_percentage
-
-
 def prepare_time_data(time_data_list, keypair, timepairs):
     """Returns a dictionary containing the given data in the format for the time plot."""
     key, keyname = keypair
@@ -11,19 +6,13 @@ def prepare_time_data(time_data_list, keypair, timepairs):
     for col in data.columns:
         if "seconds" in col:
             data.insert(data.columns.get_loc(col)+1, col.replace("in_seconds", "percentage"), (data[col] / data["wall_clock_time_in_seconds"] * 100).round(3))
-    print("Possible data for time plot:")
-    print(data.columns)
     data.loc[:, "KEY"] = keyname
     data.insert(2, "SUBKEY_VALUE", key_value)
     for name in timepairs:
-        # data[timepairs[name]] = data[name]
         data.insert(data.columns.get_loc(name)+1, timepairs[name], data[name])
     data = data.sort_values(by=["SUBKEY_VALUE"])
-    
-    print("Possible data for time plot:")
-    print(data.columns)
-    # print(data)
-    # return data
+    # print("Possible data for time plot:")
+    # print(data.columns)
     export = data.to_dict(orient="list")
     return export
 
@@ -36,7 +25,6 @@ def prepare_size_data(size_data, keypair, sizepairs):
     for i in range(4):
         key_data.loc[-(i+1)] = i
     key_data.insert(5, "GB_SIZE", round((key_data["BIT_SIZE"].astype(float)) / (1000*1000*1000*8), 3))
-
     data = key_data.pivot_table(
         index="SUBKEY",
         columns="LEVEL",
@@ -58,9 +46,7 @@ def prepare_size_data(size_data, keypair, sizepairs):
     for name in sizepairs:
         data.insert(data.columns.get_loc(name)+1, sizepairs[name], data[name])
     data = data.sort_values(by=["SUBKEY_VALUE"])
-    print("Possible data for size plot:")
-    print(data.columns)
-    # print(data)
-    # return data
+    # print("Possible data for size plot:")
+    # print(data.columns)
     export = data.to_dict(orient="list")
     return export

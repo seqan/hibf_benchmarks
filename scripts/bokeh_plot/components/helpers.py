@@ -1,11 +1,6 @@
 """Helper functions."""
 
 
-def convert_list_to_float(data):
-    """Returns a list containing the values of the given list as floats."""
-    return [float(i) for i in data]
-
-
 def convert_dic_to_list(data):
     """Returns a list containing the values of the given list as strings."""
     return [str(i) for i in data]
@@ -20,8 +15,3 @@ def get_max_result(data, factor):
     """Returns the maximum value of the given list multiplied by the given factor."""
     print(data)
     return round(max(data) * factor, 3)
-
-
-def devide_arrays_in_percentage(list1, list2):
-    """Returns the percentage of each element from list1 to list2."""
-    return [round(float(i) / float(j) * 100, 2) for i, j in zip(list1, list2)]

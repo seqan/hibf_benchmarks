@@ -18,7 +18,6 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection
         file_name = "tmax"
     if format_selection == "TIME_FORMAT":
         percentage_name = key.replace("in_seconds", "percentage")
-        print(percentage_name)
         normal_time_description = [
             (file_name, "@SUBKEY_VALUE"),
             ("Wall clock time", "@wall_clock_time_in_seconds{0.00} sek"),
@@ -38,7 +37,6 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection
     else:
         percentage_name = key.replace("GB_SIZE", "GB_SIZE_percentage")
         avg_load_factor = key.replace("GB_SIZE", "AVG_LOAD_FACTOR")
-        print(avg_load_factor)
         normal_size_description = [
             (file_name, "@SUBKEY_VALUE"),
             ("Total size", "@GB_TOTAL_SIZE{0.00}GB"),
