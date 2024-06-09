@@ -26,7 +26,11 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection
             (display_key, "@$name{0.00} sek"),
             ("Percentage", f"@{percentage_name}{{0.00}}%"),
         ]
-        advanced_time_description = normal_time_description + [("advanced", "advanced")]
+        advanced_time_description = normal_time_description + [
+            ("Compute minimizer (avg)", "@compute_minimiser_avg_in_seconds{0.00} sek"),
+            ("Query IBF (avg)", "@query_ibf_avg_in_seconds{0.00} sek"),
+            ("advanced", "advanced")
+        ]
         normal_time_description_list.append(normal_time_description)
         advanced_time_description_list.append(advanced_time_description)
         hover_tool = HoverTool(tooltips=normal_time_description, renderers=[renderer])
@@ -34,6 +38,8 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection
         time_plot_hovers.append(hover_tool)
     else:
         percentage_name = key.replace("GB_SIZE", "GB_SIZE_percentage")
+        avg_load_factor = key.replace("GB_SIZE", "AVG_LOAD_FACTOR")
+        print(avg_load_factor)
         normal_size_description = [
             (file_name, "@SUBKEY_VALUE"),
             ("Total size", "@GB_TOTAL_SIZE{0.00}GB"),
@@ -41,7 +47,7 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_selection
             ("Percentage", f"@{percentage_name}{{0.00}}%"),
         ]
         advanced_size_description = normal_size_description + [
-            ("Load Factor (avg)", f"@$(name)_avg_load_factor{{0.00}}"),
+            ("Load Factor (avg)", f"@{avg_load_factor}{{0.00}}"),
             ("advanced", "advanced"),
         ]
         normal_size_description_list.append(normal_size_description)
