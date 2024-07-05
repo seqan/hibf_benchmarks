@@ -47,6 +47,9 @@ NUM_THREADS: 1 # Number of threads to use per task, not for parallel execution
 TIME_FORMAT:
   - "KEY"
   - "SUBKEY"
+  - "compute_minimiser_avg_in_seconds"
+  - "query_ibf_avg_in_seconds"
+  - "generate_results_avg_in_seconds"
   - "wall_clock_time_in_seconds"
   - "determine_query_length_in_seconds"
   - "query_file_io_in_seconds"

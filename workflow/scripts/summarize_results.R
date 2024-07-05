@@ -6,7 +6,6 @@ sink(log_file, type = "message")
 
 INPUT_FILES <- snakemake@input[["INPUT_FILES"]]
 OUTPUT_FILE <- snakemake@output[["OUTPUT_FILE"]]
-FORMAT <- snakemake@params[["FORMAT"]]
 
 extract_part <- function(file) {
     # Extract the key and subkey from the file name.
@@ -30,9 +29,7 @@ read_and_modify <- function(FILE_PATH) {
     # Read the file and add the key and subkey.
     data <- read.delim(FILE_PATH, comment.char = "#", sep = "\t", header = TRUE)
     extracted_part <- extract_part(FILE_PATH)
-    data$KEY <- extracted_part[[1]]
-    data$SUBKEY <- get_key(extracted_part[[2]])
-    data <- data[FORMAT]
+    data <- data.frame(KEY = extracted_part[[1]], SUBKEY = get_key(extracted_part[[2]]), data)
     return(data)
 }
 

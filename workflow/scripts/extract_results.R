@@ -37,7 +37,7 @@ new_subkeys <- strsplit(input_size$SUBKEY, "=")
 input_size$SUBKEY <- sapply(new_subkeys, function(x) x[2])
 
 for (key in snakemake@config[["KEYS"]]) {
-    time_data <- input_time[input_time$KEY == key, TIME_FORMAT[TIME_FORMAT != "KEY" & TIME_FORMAT != "wall_clock_time_in_seconds"]]
+    time_data <- input_time[input_time$KEY == key, TIME_FORMAT[TIME_FORMAT != "KEY"]]
     time_data <- transform_time(time_data)
     output_time <- file.path("results", "prepared_time", key)
     if (length(time_data) == 0)

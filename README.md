@@ -24,3 +24,15 @@ snakemake --cores 32
 ```
 
 The results can be found in `results/html/index.html`.
+
+### Testing
+
+To test the workflow without running raptor, data is provided in `.github/data`:
+
+```bash
+# run from repository root directory
+mkdir --parents results
+tar xf .github/data/data.tar.zst --directory=results
+export CI=true # Skips running raptor
+snakemake --use-conda --cores 2 --forceall
+```

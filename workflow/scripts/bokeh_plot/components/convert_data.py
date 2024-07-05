@@ -3,12 +3,12 @@
 from components.helpers import add_arrays, convert_list_to_float, devide_arrays_in_percentage
 
 
-def convert_time_data(data, key, time_format):
+def convert_time_data(data, key, time_format, time_offset):
     """Returns a dictionary containing the given data in the format for the time plot."""
     result = {}
     result["SUBKEY"] = [f"{key} = {value}" for value in data[0]]
     result["value"] = data[0]
-    result["all_times"] = add_arrays(data[1:])
+    result["all_times"] = add_arrays(data[(1 + time_offset) :])
     for i, element in enumerate(data[1:]):
         result[time_format[i + 1]] = convert_list_to_float(element)
         result[f"{time_format[i + 1]}_percentage"] = devide_arrays_in_percentage(
