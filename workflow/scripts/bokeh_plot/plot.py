@@ -19,12 +19,19 @@ from components.plot_css_html import (
     get_global_style,
     get_tab_style,
 )
-from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot
+from components.plot_style import (
+    add_description_tab,
+    add_legend,
+    add_second_y_axis,
+    configure_size_plot,
+    configure_time_plot,
+)
 
 log_init(snakemake.log[0])
 
 TIME_FORMAT = snakemake.config["PLOT_TIME_FORMAT"]
 TIME_NAMES = snakemake.config["TIME_NAMES"]
+TIME_OFFSET = snakemake.config["PLOT_TIME_ADVANCED_OFFSET"]
 SIZE_FORMAT = snakemake.config["PLOT_SIZE_FORMAT"]
 SIZE_NAMES = snakemake.config["SIZE_NAMES"]
 KEYS = snakemake.config["KEYS"]
@@ -39,9 +46,9 @@ def create_time_plot(time_data, y_range, max_result_time, file_name, scale_in_mi
         tools="",
     )
     renderers = plot.hbar_stack(
-        stackers=TIME_FORMAT[1:], y=TIME_FORMAT[0], height=0.4, source=(time_data), color=Set2_6
+        stackers=TIME_FORMAT[(1 + TIME_OFFSET) :], y=TIME_FORMAT[0], height=0.4, source=(time_data), color=Set2_6
     )
-    add_legend(plot, renderers, file_name, TIME_NAMES, SIZE_NAMES, "TIME_FORMAT", "left")
+    add_legend(plot, renderers, file_name, TIME_NAMES[TIME_OFFSET:], SIZE_NAMES, "TIME_FORMAT", "left")
     configure_time_plot(plot, scale_in_minutes)
     add_second_y_axis(plot, y_range)
     return plot
@@ -75,9 +82,9 @@ def create_plot():
             time_data_list, size_data_list = list(time_reader), list(size_reader)
             if len(time_data_list) == 0 or len(size_data_list) == 0:
                 continue
-            time_data = convert_time_data(time_data_list, file_name, TIME_FORMAT)
+            time_data = convert_time_data(time_data_list, file_name, TIME_FORMAT, TIME_OFFSET)
             size_data = convert_size_data(size_data_list, file_name, SIZE_FORMAT)
-            max_result_time = get_max_result(time_data_list[1:], 1.01)
+            max_result_time = get_max_result(time_data_list[5:], 1.01)
             max_result_size = get_max_result(size_data_list[1:5], 1.01)
             scale_in_minutes = max_result_time > 120
 
@@ -102,9 +109,8 @@ def create_plot():
             child=Div(text=create_dataset_text(), styles={"color": "#d7d7d7", "font-size": "14px"}), title="Dataset"
         )
     )
-    tab_style = get_tab_style()
-    global_style = get_global_style()
-    save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[tab_style, global_style]))
+    add_description_tab(tabs)
+    save(Tabs(tabs=tabs, sizing_mode="scale_both", stylesheets=[get_tab_style(), get_global_style()]))
 
 
 create_plot()

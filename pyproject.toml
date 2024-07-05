@@ -1,17 +1,20 @@
 [tool.black]
 line-length = 120
 include = '(\.pyi?|\.ipynb)$'
+extend_exclude = "/(\\.snakemake|results|logs)/"
 quiet = true
 
 [tool.isort]
 profile = "black"
 src_paths = ['(\.pyi?|\.ipynb)$']
+extend_skip_glob = [".snakemake/**", "results/**", "logs/**"]
 known_first_party = ["components"]
 line_length = 120
 quiet = true
 
 [tool.pylint.main]
 recursive = true
+ignore-paths = [".snakemake/.*$", "results/.*$", "logs/.*$"]
 
 [tool.pylint.format]
 max-line-length = 120

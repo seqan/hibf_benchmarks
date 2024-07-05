@@ -26,12 +26,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-data/1024
-build/
-build
-log/
+logs/
 .snakemake/
-bokeh_plot.html
 results
 
 # PyInstaller

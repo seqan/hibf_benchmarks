@@ -126,9 +126,56 @@ def get_tab_style():
         """
 
 
+def get_button_style():
+    """Returns the CSS style for the toggle button."""
+    return [
+        r"""
+        .bk-btn, .bk-btn-success, .bk-btn:hover, .bk-btn:active, .bk-btn:focus {
+            background: #500000;
+            border: solid 1px #777777;
+            color: #d0d0d0;
+            cursor: pointer;
+            outline: none;
+            box-shadow: none;
+        }
+        .bk-btn.bk-btn-success.bk-active {
+            background: #003509;
+            color: #d0d0d0;
+            border: solid 1px #777777;
+        }
+        .bk-btn:hover, .bk-btn.bk-btn-success.bk-active:hover {
+            border: solid 1px #888888;
+        }
+    """
+    ]
+
+
 def get_global_style():
     """Returns the global CSS style."""
     return """
         body { background-color: #15191c; }
         div { max-height: 96vh; max-width: 100vw; }
+        """
+
+
+def get_hover_code():
+    """Returns the JavaScript code for changing the hover tooltips."""
+    return """
+        var current_state = button.active;
+        var time_description, size_description;
+
+        if (current_state === 'false') {
+            time_description = normal_time_description_list;
+            size_description = normal_size_description_list;
+        } else {
+            time_description = advanced_time_description_list;
+            size_description = advanced_size_description_list;
+        }
+
+        for (var i = 0; i < time_plot_hovers.length; i++) {
+            time_plot_hovers[i].tooltips = time_description[i];
+        }
+        for (var i = 0; i < size_plot_hovers.length; i++) {
+            size_plot_hovers[i].tooltips = size_description[i];
+        }
         """
