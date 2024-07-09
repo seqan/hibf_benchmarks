@@ -84,7 +84,7 @@ def create_plot():
                 continue
             time_data = convert_time_data(time_data_list, file_name, TIME_FORMAT, TIME_OFFSET)
             size_data = convert_size_data(size_data_list, file_name, SIZE_FORMAT)
-            max_result_time = get_max_result(time_data_list[5:], 1.01)
+            max_result_time = get_max_result(time_data_list[(1 + TIME_OFFSET) :], 1.01)
             max_result_size = get_max_result(size_data_list[1:5], 1.01)
             scale_in_minutes = max_result_time > 120
 
