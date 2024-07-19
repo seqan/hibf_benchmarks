@@ -10,24 +10,28 @@
 * Plot configuration: [config/plot_config.yaml](config/plot_config.yaml)
 * Meta information: [workflow/scripts/bokeh_plot/components/plot_css_html.py](workflow/scripts/bokeh_plot/components/plot_css_html.py)
 
-### Install
+### Setup
+
+* [Conda](https://docs.anaconda.com/miniconda/miniconda-install) or [Mamba](https://github.com/conda-forge/miniforge?tab=readme-ov-file#install)
+* [Snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 
 ```bash
-conda env create --channel conda-forge --name snakemake bioconda::snakemake r-base r-here r-yaml r-tidyr bokeh
+# Create an environment called `snakemake` with snakemake installed
+conda env create --channel conda-forge --name snakemake bioconda::snakemake
 ```
 
 ### Run
 
 ```bash
 conda activate snakemake
-snakemake --cores 32
+snakemake --use-conda --cores 2
 ```
 
 The results can be found in `results/html/index.html`.
 
-### Testing
+### Testing/Running without Raptor
 
-To test the workflow without running raptor, data is provided in `.github/data`:
+To test the workflow without running Raptor, data is provided in `.github/data`:
 
 ```bash
 # run from repository root directory
