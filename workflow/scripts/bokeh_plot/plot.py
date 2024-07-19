@@ -3,7 +3,7 @@
 import csv
 import os
 
-from bokeh.layouts import column, row
+from bokeh.layouts import row
 from bokeh.models import Div, TabPanel, Tabs
 from bokeh.palettes import Set2_4, Set2_6
 from bokeh.plotting import curdoc, figure, output_file, save
@@ -12,13 +12,7 @@ from bokeh.themes import Theme
 from components.convert_data import convert_size_data, convert_time_data
 from components.helpers import convert_list_to_string, get_max_result
 from components.log_init import log_init
-from components.plot_css_html import (
-    create_dataset_text,
-    create_latex_text,
-    create_vercel_div,
-    get_global_style,
-    get_tab_style,
-)
+from components.plot_css_html import create_dataset_text, create_latex_text, get_global_style, get_tab_style
 from components.plot_style import (
     add_description_tab,
     add_legend,
@@ -96,9 +90,7 @@ def create_plot():
             plot2 = create_size_plot(size_data, plot1.y_range, max_result_size, file_name)
             both_plots = row(plot1, plot2, sizing_mode="scale_both")
 
-            vercel_div = create_vercel_div()
-            all_elements = column(both_plots, vercel_div, sizing_mode="scale_both")
-            tabs.append(TabPanel(child=all_elements, title=KEYS_NAMES[file_name_index]))
+            tabs.append(TabPanel(child=both_plots, title=KEYS_NAMES[file_name_index]))
     tabs.append(
         TabPanel(
             child=Div(text=create_latex_text(), styles={"color": "#d7d7d7", "font-size": "14px"}), title="Parameters"
