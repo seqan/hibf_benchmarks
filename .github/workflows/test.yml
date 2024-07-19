@@ -1,7 +1,7 @@
 name: Test
 
 on:
-  pull_request:
+  pull_request_target:
 
 concurrency:
   group: test-${{ github.event.pull_request.number }}
@@ -16,12 +16,16 @@ defaults:
 
 jobs:
   build-html:
-    name: build
-    runs-on: ubuntu-22.04
+    name: Build HTML
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'seqan'
     timeout-minutes: 30
     steps:
+      # pull_request_target does not checkout the merge commit by default
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
@@ -41,4 +45,15 @@ jobs:
           tar xf ${{ github.workspace }}/.github/data/data.tar.zst -C ${{ github.workspace }}/results
 
       - name: Run snakemake
-        run: snakemake --use-conda --conda-frontend mamba --cores 2
+        run: snakemake --use-conda --conda-frontend mamba --cores $(nproc)
+
+      - name: Deploy Preview
+        if: github.repository_owner == 'seqan'
+        uses: seqan/actions/documentation_deploy_preview@main
+        with:
+          deploy_host: ${{ secrets.DEPLOY_HOST }}
+          deploy_user: ${{ secrets.DEPLOY_USER }}
+          deploy_ssh_key: ${{ secrets.DEPLOY_SSH_KEY }}
+          deploy_base_path: ${{ secrets.DEPLOY_PREVIEW_BASE_PATH }}
+          source_path_user_doc: results/html
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}

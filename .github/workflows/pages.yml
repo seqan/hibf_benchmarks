@@ -21,7 +21,8 @@ defaults:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'seqan'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,7 +45,7 @@ jobs:
           tar xf ${{ github.workspace }}/.github/data/data.tar.zst -C ${{ github.workspace }}/results
 
       - name: Run snakemake
-        run: snakemake --use-conda --conda-frontend mamba --cores 2
+        run: snakemake --use-conda --conda-frontend mamba --cores $(nproc)
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
