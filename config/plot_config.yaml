@@ -1,49 +1,60 @@
-KEYS_NAMES:
-  - "alpha"
-  - "hash"
-  - "k-mer"
-  - "relaxed-fpr"
-  - "no U no R"
-  - "U"
-  - "U and R"
+PLOT_NAME: "index"
 
-PLOT_TIME_FORMAT:
-  - "SUBKEY"
-  - "compute_minimiser_avg_in_seconds"
-  - "query_ibf_avg_in_seconds"
-  - "generate_results_avg_in_seconds"
-  - "wall_clock_time_in_seconds"
-  - "determine_query_length_in_seconds"
-  - "query_file_io_in_seconds"
-  - "load_index_in_seconds"
-  - "compute_minimiser_max_in_seconds"
-  - "query_ibf_max_in_seconds"
-  - "generate_results_max_in_seconds"
 
-# How many entries in PLOT_TIME_FORMAT after "SUBKEY" are advanced
-PLOT_TIME_ADVANCED_OFFSET: 4
+KEYS:
+  alpha: alpha
+  hash: hash
+  kmer: k-mer
+  relaxed-fpr: relaxed-fpr
+  none: none
+  U: U
+  U+R: U+R
 
-TIME_NAMES:
-  - "Compute minimizer (avg)"
-  - "Query IBF (avg)"
-  - "Generate results (avg)"
-  - "Wall clock time"
-  - "Determine query length"
-  - "Queryfile IO"
-  - "Load index"
-  - "Compute minimizer (max)"
-  - "Query IBF (max)"
-  - "Generate results (max)"
 
-PLOT_SIZE_FORMAT:
-  - "SUBKEY"
-  - "LEVEL_0"
-  - "LEVEL_1"
-  - "LEVEL_2"
-  - "LEVEL_3"
+TIME:
+  FORMAT:
+    - determine_query_length_in_seconds
+    - query_file_io_in_seconds
+    - load_index_in_seconds
+    - compute_minimiser_max_in_seconds
+    - query_ibf_max_in_seconds
+    - generate_results_max_in_seconds
+  NAMES:
+    SUBKEY_VALUE: "Subkey"
+    determine_query_length_in_seconds: "Determine query length"
+    determine_query_length_percentage: "Determine query length percentage"
+    query_file_io_in_seconds: "Queryfile IO"
+    query_file_io_percentage: "Queryfile IO percentage"
+    load_index_in_seconds: "Load index"
+    load_index_percentage: "Load index percentage"
+    compute_minimiser_avg_in_seconds: "Compute minimizer (avg)"
+    compute_minimiser_avg_percentage: "Compute minimizer (avg) percentage"
+    compute_minimiser_max_in_seconds: "Compute minimizer (max)"
+    compute_minimiser_max_percentage: "Compute minimizer (max) percentage"
+    query_ibf_avg_in_seconds: "Query IBF (avg)"
+    query_ibf_avg_percentage: "Query IBF (avg) percentage"
+    query_ibf_max_in_seconds: "Query IBF (max)"
+    query_ibf_max_percentage: "Query IBF (max) percentage"
+    generate_results_avg_in_seconds: "Generate results (avg)"
+    generate_results_avg_percentage: "Generate results (avg) percentage"
+    generate_results_max_in_seconds: "Generate results (max)"
+    generate_results_max_percentage: "Generate results (max) percentage"
 
-SIZE_NAMES:
-  - "Level 0"
-  - "Level 1"
-  - "Level 2"
-  - "Level 3"
+
+SIZE:
+  FORMAT:
+    - LEVEL_0_GB_SIZE
+    - LEVEL_1_GB_SIZE
+    - LEVEL_2_GB_SIZE
+    - LEVEL_3_GB_SIZE
+  NAMES:
+    SUBKEY_VALUE: "Subkey"
+    LEVEL_0_GB_SIZE: "Level 0"
+    LEVEL_1_GB_SIZE: "Level 1"
+    LEVEL_2_GB_SIZE: "Level 2"
+    LEVEL_3_GB_SIZE: "Level 3"
+    LEVEL_0_AVG_LOAD_FACTOR: "Level 0: Avg load factor"
+    LEVEL_1_AVG_LOAD_FACTOR: "Level 1: Avg load factor"
+    LEVEL_2_AVG_LOAD_FACTOR: "Level 2: Avg load factor"
+    LEVEL_3_AVG_LOAD_FACTOR: "Level 3: Avg load factor"
+    GB_TOTAL_SIZE: "Total size"
