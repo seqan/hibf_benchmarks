@@ -153,7 +153,12 @@ def configure_time_plot(plot, scale_in_minutes):
         plot.xaxis.ticker = AdaptiveTicker(base=10)
         plot.xaxis.axis_label = "time in seconds"
     plot.toolbar.logo = None
-    plot.toolbar_location = None
+    plot.toolbar_location = "below"
+    plot.toolbar.autohide = True
+    zoom_tool = WheelZoomTool(maintain_focus=False)
+    plot.add_tools(PanTool(), zoom_tool, BoxZoomTool(), ResetTool())
+    plot.toolbar.active_scroll = zoom_tool
+    plot.x_range.bounds = (0, float("inf"))
 
     plot.yaxis.visible = False
     plot.y_range.range_padding = 0.1
