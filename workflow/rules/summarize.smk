@@ -9,8 +9,6 @@ rule summarize_timings:
         ),
     output:
         OUTPUT_FILE="results/time",
-    params:
-        FORMAT=config["TIME_FORMAT"],
     log:
         "logs/summarize_timings/summarize_timings.log",
     conda:
@@ -24,8 +22,6 @@ rule summarize_sizes:
         INPUT_FILES=expand("results/{param}/out.sizes", param=get_params(False)),
     output:
         OUTPUT_FILE="results/size",
-    params:
-        FORMAT=config["SIZE_FORMAT"],
     log:
         "logs/summarize_sizes/summarize_sizes.log",
     conda:

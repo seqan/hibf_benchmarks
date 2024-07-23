@@ -15,11 +15,20 @@ from bokeh.models import (
     PanTool,
     ResetTool,
     TabPanel,
+    Tabs,
     Toggle,
     WheelZoomTool,
 )
+from bokeh.plotting import save
 
-from components.plot_css_html import create_latex_text, get_button_style, get_hover_code
+from components.plot_css_html import (
+    create_dataset_text,
+    create_latex_text,
+    get_button_style,
+    get_global_style,
+    get_hover_code,
+    get_tab_style,
+)
 
 time_plot_hovers = []
 size_plot_hovers = []
@@ -29,30 +38,52 @@ normal_size_description_list = []
 advanced_size_description_list = []
 
 
+def time_value_pairs(key, display_key, file_name):
+    """Returns a dictionary with the key-value pairs for the hover tool."""
+    result = {}
+    result["subkey"] = (file_name, "@SUBKEY_VALUE")
+    result["sum_of_times"] = ("Sum of times", "@TOTAL_TIME{0.00} sek")
+    result["display_key"] = (display_key, "@$name{0.00} sek")
+    result["wall_clock_time"] = ("Wall clock time", "@wall_clock_time_in_seconds{0.00} sek")
+
+    percentage_name = key.replace("in_seconds", "percentage")
+    result["percentage"] = ("Percentage", f"@{percentage_name}{{0.00}}%")
+
+    if display_key.endswith("(max)"):
+        new_display = display_key.replace("(max)", "(avg)")
+        new_key = key.replace("max", "avg")
+        result["display_key_max"] = (new_display, f"@{new_key}{{0.00}} sek")
+
+    return result
+
+
 def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
     """Adds a hover tool to the plot."""
     if file_name in ("none", "U", "U+R"):
         file_name = "tmax"
     if format_kind == "TIME_FORMAT":
+        info_dict = time_value_pairs(key, display_key, file_name)
+
         normal_time_description = [
-            (file_name, "@value"),
-            ("Wall clock time", "@all_times{0.00} sek"),
-            (display_key, "@$name{0.00} sek"),
-            ("Percentage", f"@{key}_percentage{{0.00}}%"),
+            info_dict["subkey"],
+            info_dict["sum_of_times"],
+            info_dict["display_key"],
+            info_dict["percentage"],
         ]
+
         advanced_time_description = [
-            (file_name, "@value"),
-            ("Wall clock time", "@all_times{0.00} sek"),
-            ("Measured Time", "@wall_clock_time_in_seconds{0.00} sek"),
-            (display_key, "@$name{0.00} sek"),
+            info_dict["subkey"],
+            info_dict["sum_of_times"],
+            info_dict["wall_clock_time"],
+            info_dict["display_key"],
         ]
         if display_key.endswith("(max)"):
-            new_display = display_key.replace("(max)", "(avg)")
-            new_key = key.replace("max", "avg")
-            advanced_time_description += [(new_display, f"@{new_key}{{0.00}} sek")]
-        advanced_time_description += [("Percentage", f"@{key}_percentage{{0.00}}%")]
+            advanced_time_description += [info_dict["display_key_max"]]
+        advanced_time_description += [info_dict["percentage"]]
+
         normal_time_description_list.append(normal_time_description)
         advanced_time_description_list.append(advanced_time_description)
+
         hover_tool = HoverTool(
             tooltips=normal_time_description,
             renderers=[renderer],
@@ -61,20 +92,18 @@ def add_hover_tool(plot, renderer, key, display_key, file_name, format_kind):
         plot.add_tools(hover_tool)
         time_plot_hovers.append(hover_tool)
     else:
+        percentage_name = key.replace("GB_SIZE", "GB_SIZE_percentage")
+        avg_load_factor = key.replace("GB_SIZE", "AVG_LOAD_FACTOR")
         normal_size_description = [
-            (file_name, "@value"),
-            ("Size", "@sizes{0.00}GiB"),
-            (display_key, "@$name{0.00}GiB"),
-            ("Percentage", f"@{key}_percentage{{0.00}}%"),
+            (file_name, "@SUBKEY_VALUE"),
+            ("Total size", "@GB_TOTAL_SIZE{0.00}GB"),
+            (display_key, "@$name{0.00}GB"),
+            ("Percentage", f"@{percentage_name}{{0.00}}%"),
         ]
-        advanced_size_description = normal_size_description + [("Load Factor (avg)", f"@{key}_avg_load_factor{{0.00}}")]
+        advanced_size_description = normal_size_description + [("Load Factor (avg)", f"@{avg_load_factor}{{0.00}}")]
         normal_size_description_list.append(normal_size_description)
         advanced_size_description_list.append(advanced_size_description)
-        hover_tool = HoverTool(
-            tooltips=normal_size_description,
-            renderers=[renderer],
-            visible=False,
-        )
+        hover_tool = HoverTool(tooltips=normal_size_description, renderers=[renderer], visible=False)
         plot.add_tools(hover_tool)
         size_plot_hovers.append(hover_tool)
 
@@ -124,12 +153,7 @@ def configure_time_plot(plot, scale_in_minutes):
         plot.xaxis.ticker = AdaptiveTicker(base=10)
         plot.xaxis.axis_label = "time in seconds"
     plot.toolbar.logo = None
-    plot.toolbar_location = "below"
-    plot.toolbar.autohide = True
-    zoom_tool = WheelZoomTool(maintain_focus=False)
-    plot.add_tools(PanTool(), zoom_tool, BoxZoomTool(), ResetTool())
-    plot.toolbar.active_scroll = zoom_tool
-    plot.x_range.bounds = (0, float("inf"))
+    plot.toolbar_location = None
 
     plot.yaxis.visible = False
     plot.y_range.range_padding = 0.1
@@ -161,7 +185,7 @@ def configure_size_plot(plot):
 
 def add_description_tab(tabs):
     """Adds a description tab to the plot."""
-    text_div = Div(text=create_latex_text(), styles={"color": "white", "font-size": "14px"})
+    text_div = Div(text=create_latex_text(), styles={"color": "#d7d7d7", "font-size": "14px"})
     toggle_button = Toggle(label="Advanced Mode", button_type="success", stylesheets=get_button_style())
     toggle_button.js_on_click(
         CustomJS(
@@ -178,3 +202,32 @@ def add_description_tab(tabs):
         )
     )
     tabs.append(TabPanel(child=column(text_div, toggle_button), title="Description"))
+
+
+def add_dataset_tab(tabs):
+    """Adds a dataset tab to the plot."""
+    text_div = Div(text=create_dataset_text(), styles={"color": "#d7d7d7", "font-size": "14px"})
+    tabs.append(TabPanel(child=text_div, title="Dataset"))
+
+
+def save_tabs(tabs):
+    """Saves the tabs to the file."""
+    add_description_tab(tabs)
+    add_dataset_tab(tabs)
+    back_tab = TabPanel(child=Div(text=""), title="⤺ Back to gallery")
+    tabs.append(back_tab)
+    final_tab = Tabs(
+        tabs=tabs,
+        sizing_mode="scale_both",
+        stylesheets=[get_tab_style() + f".bk-tab:nth-child({len(tabs)}){{margin-left:auto;}}", get_global_style()],
+    )
+    toggle_legend_js = CustomJS(
+        args={"legend": final_tab, "pos": len(tabs) - 1},
+        code="""
+            if (legend.active === pos) {
+            window.location.href = "index.html";
+            }
+            """,
+    )
+    final_tab.js_on_change("active", toggle_legend_js)
+    save(final_tab)

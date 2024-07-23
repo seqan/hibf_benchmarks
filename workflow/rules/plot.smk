@@ -1,30 +1,14 @@
-rule extract_data_for_plot:
+rule plot_data:
     input:
         SIZE_INPUT="results/size",
         TIME_INPUT="results/time",
     output:
-        expand(
-            "results/prepared_{format}/{key}",
-            format=["time", "size"],
-            key=config["KEYS"],
-        ),
-    log:
-        "logs/extract_data_for_plot/extract_data_for_plot.log",
-    conda:
-        "../envs/r.yml"
-    script:
-        "../scripts/extract_results.R"
-
-
-rule plot_data:
-    input:
-        expand(
-            "results/prepared_{format}/{key}",
-            format=["time", "size"],
-            key=config["KEYS"],
-        ),
-    output:
-        "results/html/index.html",
+        PLOT_FILE=f"results/html/{config['PLOT_NAME']}.html",
+    params:
+        THEME="workflow/scripts/bokeh_plot/plot_theme.yaml",
+        KEYS=config["KEYS"],
+        TIME=config["TIME"],
+        SIZE=config["SIZE"],
     log:
         "logs/plot_data/plot_data.log",
     conda:

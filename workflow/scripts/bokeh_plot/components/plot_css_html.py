@@ -78,11 +78,16 @@ def get_tab_style():
 
         .bk-tab {
             border-right: 1px solid #404040;
+            border-width: 3px 1px 0px 1px;
+            border-color: #15191c #404040 #404040 #404040;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out;
         }
 
         :host(.bk-Tabs) .bk-header {
             color: #d0d0d0;
             border-bottom: 1px solid #404040;
+            font-size: 1.1em;
         }
 
         .bk-tab.bk-active {
@@ -98,13 +103,17 @@ def get_tab_style():
         .bk-tab:focus {
             outline: none;
         }
+
+        .bk-tab:active {
+            outline: none;
+        }
         """
 
 
 def get_button_style():
     """Returns the CSS style for the toggle button."""
     return [
-        r"""
+        """
         .bk-btn, .bk-btn-success, .bk-btn:hover, .bk-btn:active, .bk-btn:focus {
             background: #500000;
             border: solid 1px #777777;
@@ -139,7 +148,7 @@ def get_hover_code():
         var current_state = button.active;
         var time_description, size_description;
 
-        if (current_state === 'false') {
+        if (current_state === false) {
             time_description = normal_time_description_list;
             size_description = normal_size_description_list;
         } else {
