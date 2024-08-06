@@ -25,7 +25,7 @@ rule plot_landingpage:
         OUTPUT_FILE="results/html/index.html",
         PNG_FILE=f"results/html/{config['PLOT_NAME']}.png",
     params:
-        EXTERNAL_FILES=True,
+        EXTRA_FILE_PLOTTING=config["EXTRA_FILE_PLOTTING"],
         HTML_DIR="results/html",
     log:
         "logs/plot_landingpage/plot_landingpage.log",

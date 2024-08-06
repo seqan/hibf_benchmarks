@@ -2,20 +2,24 @@ import os
 import re
 from html2image import Html2Image
 
+from bokeh_plot.components.log_init import log_init
+
 html_files = snakemake.input["PLOT_FILE"]
 output_file = snakemake.output["OUTPUT_FILE"]
-extrern_files = snakemake.params["EXTERNAL_FILES"]
+extra_file_plotting = snakemake.params["EXTRA_FILE_PLOTTING"]
 html_dir = snakemake.params["HTML_DIR"]
 
+log_init(snakemake.log[0])
+
 # get html files
-if extrern_files:
+if extra_file_plotting:
     html_files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith('.html')]
 
 # get html names
 html_names = [re.sub(".html", "", html_file) for html_file in html_files]
 
 # create png for each html
-hti = Html2Image(output_path=html_dir)
+hti = Html2Image(output_path=html_dir, custom_flags=['--headless', '--disable-gpu'])
 for html_file in html_files:
     hti.screenshot(
         html_file=html_file,
@@ -73,12 +77,13 @@ html_text = """
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
             overflow: hidden;
             text-align: center;
-            transition: 200ms;
+            transform: scale(0.97);
+            transition: 300ms ease-in-out;
         }
 
         .gallery-item:hover {
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.134);
-            transition: 200ms;
+            transform: scale(1);
         }
 
         .gallery-item img {
@@ -94,11 +99,11 @@ html_text = """
             display: block;
             padding: 10px;
             font-size: 1em;
+            transition: 400ms ease-in-out;
         }
 
         .gallery-item a:hover {
             color: #c2c2c2;
-            transition: 200ms;
         }
     </style>
 </head>
