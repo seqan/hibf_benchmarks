@@ -17,7 +17,6 @@ rule plot_data:
         "../scripts/bokeh_plot/plot.py"
 
 
-
 rule plot_landingpage:
     input:
         PLOT_FILE=f"results/html/{config['PLOT_NAME']}.html",
