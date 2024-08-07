@@ -1,8 +1,8 @@
 import os
 import re
-from html2image import Html2Image
 
 from bokeh_plot.components.log_init import log_init
+from html2image import Html2Image
 
 html_files = snakemake.input["PLOT_FILE"]
 output_file = snakemake.output["OUTPUT_FILE"]
@@ -13,31 +13,34 @@ log_init(snakemake.log[0])
 
 # get html files
 if extra_file_plotting:
-    html_files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith('.html')]
+    html_files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith(".html")]
 
 # get html names
 html_names = [re.sub(".html", "", html_file) for html_file in html_files]
 
 # create png for each html
-hti = Html2Image(output_path=html_dir, custom_flags=['--headless', '--disable-gpu'])
+hti = Html2Image(output_path=html_dir, custom_flags=["--headless", "--disable-gpu"])
 for html_file in html_files:
-    hti.screenshot(
-        html_file=html_file,
-        save_as=re.sub(".html", ".png", os.path.basename(html_file))
-    )
+    hti.screenshot(html_file=html_file, save_as=re.sub(".html", ".png", os.path.basename(html_file)))
 
 # all parts of the landing page
-list_of_parts = '\n'.join([f"""
+list_of_parts = "\n".join(
+    [
+        f"""
 <div class="gallery-item">
     <a href="{os.path.basename(html_name)}.html">
         <img src="{os.path.basename(html_name)}.png" alt="Bokeh Plot {ihtml_name+1}">
         Plot {ihtml_name+1}
     </a>
 </div>
-""" for (ihtml_name, html_name) in enumerate(html_names)])
+"""
+        for (ihtml_name, html_name) in enumerate(html_names)
+    ]
+)
 
 # create landing page
-html_text = """
+html_text = (
+    """
 <!DOCTYPE html>
 <html lang="en">
 
@@ -113,12 +116,15 @@ html_text = """
         <h1>Plot Gallery</h1>
     </div>
     <div class="gallery">
-        """ + list_of_parts + """
+        """
+    + list_of_parts
+    + """
     </div>
 </body>
 </html>
 """
+)
 
 # save landing page
-with open(output_file, 'w') as f:
+with open(output_file, "w") as f:
     f.write(html_text)
