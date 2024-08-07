@@ -28,7 +28,7 @@ for html_file in html_files:
     hti.screenshot(html_file=html_file, save_as=re.sub(".html", ".png", os.path.basename(html_file)))
 
 # all parts of the landing page
-LIST_OF_PARTS = '\n'.join(
+LIST_OF_PARTS = "\n".join(
     [
         f"""
         <div class="gallery-item">
@@ -120,8 +120,8 @@ HTML_TEXT = (
             <h1>Plot Gallery</h1>
         </div>
         <div class="gallery">
-    """ 
-    + LIST_OF_PARTS 
+    """
+    + LIST_OF_PARTS
     + """
         </div>
     </body>
@@ -130,5 +130,5 @@ HTML_TEXT = (
 )
 
 # save landing page
-with open(output_file, 'w', encoding='utf-8') as f:
+with open(output_file, "w", encoding="utf-8") as f:
     f.write(HTML_TEXT)
