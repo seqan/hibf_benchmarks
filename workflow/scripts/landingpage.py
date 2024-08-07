@@ -1,3 +1,7 @@
+"""
+Modul creats a landing page gallery with screenshots of Bokeh plot HTML files.cd
+"""
+
 import os
 import re
 from html2image import Html2Image
@@ -27,7 +31,7 @@ for html_file in html_files:
     )
 
 # all parts of the landing page
-list_of_parts = '\n'.join([f"""
+LIST_OF_PARTS = '\n'.join([f"""
 <div class="gallery-item">
     <a href="{os.path.basename(html_name)}.html">
         <img src="{os.path.basename(html_name)}.png" alt="Bokeh Plot {ihtml_name+1}">
@@ -37,7 +41,7 @@ list_of_parts = '\n'.join([f"""
 """ for (ihtml_name, html_name) in enumerate(html_names)])
 
 # create landing page
-html_text = """
+HTML_TEXT = """
 <!DOCTYPE html>
 <html lang="en">
 
@@ -113,12 +117,12 @@ html_text = """
         <h1>Plot Gallery</h1>
     </div>
     <div class="gallery">
-        """ + list_of_parts + """
+        """ + LIST_OF_PARTS + """
     </div>
 </body>
 </html>
 """
 
 # save landing page
-with open(output_file, 'w') as f:
-    f.write(html_text)
+with open(output_file, 'w', encoding='utf-8') as f:
+    f.write(HTML_TEXT)
