@@ -156,7 +156,8 @@ def configure_time_plot(plot, scale_in_minutes):
     plot.toolbar_location = "below"
     plot.toolbar.autohide = True
     zoom_tool = WheelZoomTool(maintain_focus=False)
-    plot.add_tools(PanTool(), zoom_tool, BoxZoomTool(), ResetTool())
+    pan_tool = PanTool(dimensions="width")
+    plot.add_tools(pan_tool, zoom_tool, BoxZoomTool(), ResetTool())
     plot.toolbar.active_scroll = zoom_tool
     plot.x_range.bounds = (0, float("inf"))
 
@@ -173,7 +174,8 @@ def configure_size_plot(plot):
     plot.toolbar_location = "below"
     plot.toolbar.autohide = True
     zoom_tool = WheelZoomTool(maintain_focus=False)
-    plot.add_tools(PanTool(), zoom_tool, BoxZoomTool(), ResetTool())
+    pan_tool = PanTool(dimensions="width")
+    plot.add_tools(pan_tool, zoom_tool, BoxZoomTool(), ResetTool())
     plot.toolbar.active_scroll = zoom_tool
     plot.x_range.bounds = (0, float("inf"))
 
