@@ -1,4 +1,5 @@
-PLOT_NAME: "index"
+PLOT_NAME: "plot1"
+EXTRA_FILE_PLOTTING: True
 
 
 KEYS:

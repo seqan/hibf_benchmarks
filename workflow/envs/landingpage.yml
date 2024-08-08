@@ -1,0 +1,6 @@
+name: landingpage
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.4
+  - html2image=2.0.4.3
