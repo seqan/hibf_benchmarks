@@ -15,3 +15,20 @@ rule plot_data:
         "../envs/bokeh.yml"
     script:
         "../scripts/bokeh_plot/plot.py"
+
+
+rule plot_landingpage:
+    input:
+        PLOT_FILE=f"results/html/{config['PLOT_NAME']}.html",
+    output:
+        OUTPUT_FILE="results/html/index.html",
+        PNG_FILE=f"results/html/{config['PLOT_NAME']}.png",
+    params:
+        EXTRA_FILE_PLOTTING=config["EXTRA_FILE_PLOTTING"],
+        HTML_DIR="results/html",
+    log:
+        "logs/plot_landingpage/plot_landingpage.log",
+    conda:
+        "../envs/landingpage.yml"
+    script:
+        "../scripts/landingpage.py"

@@ -17,4 +17,4 @@ include: "rules/plot.smk"
 
 rule all:
     input:
-        f"results/html/{config['PLOT_NAME']}.html",
+        f"results/html/index.html",
