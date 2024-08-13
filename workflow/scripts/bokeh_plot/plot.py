@@ -79,7 +79,8 @@ def create_plot():
         y_range = size_y_range if len(size_y_range) > len(time_y_range) else time_y_range
 
         plot1 = create_time_plot(time_dic, y_range, time_x_range, key)
-        plot2 = create_size_plot(size_dic, y_range, size_x_range, key)
+        # plot1.y_range causes panning/zooming to be synchronized between the two plots
+        plot2 = create_size_plot(size_dic, plot1.y_range, size_x_range, key)
         both_plots = row(plot1, plot2, sizing_mode="scale_both")
 
         tabs.append(TabPanel(child=both_plots, title=KEYS[key]))
