@@ -1,7 +1,7 @@
 rule plot_data:
     input:
-        SIZE_INPUT="results/size",
-        TIME_INPUT="results/time",
+        SIZE_INPUT="results/summarized/size.tsv",
+        TIME_INPUT="results/summarized/time.tsv",
     output:
         PLOT_FILE=f"results/html/{config['PLOT_NAME']}.html",
     params:

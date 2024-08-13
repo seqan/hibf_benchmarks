@@ -1,7 +1,7 @@
 rule raptor_layout:
     output:
-        LAYOUT_FILE="results/{key}={param}/layout",
-        LAYOUT_TIME="results/{key}={param}/layout.time",
+        LAYOUT_FILE="results/raw_data/{key}={param}/layout",
+        LAYOUT_TIME="results/raw_data/{key}={param}/layout.time",
     threads: config["NUM_THREADS"]
     priority: 2
     message:
@@ -16,10 +16,10 @@ rule raptor_layout:
 
 rule raptor_build:
     input:
-        "results/{key}={param}/layout",
+        "results/raw_data/{key}={param}/layout",
     output:
-        INDEX_FILE="results/{key}={param}/index",
-        INDEX_TIME="results/{key}={param}/index.time",
+        INDEX_FILE="results/raw_data/{key}={param}/index",
+        INDEX_TIME="results/raw_data/{key}={param}/index.time",
     threads: config["NUM_THREADS"]
     priority: 1
     log:
@@ -42,10 +42,10 @@ rule raptor_build:
 
 rule raptor_search:
     input:
-        INDEX_FILE="results/{key}={param}/index",
+        INDEX_FILE="results/raw_data/{key}={param}/index",
     output:
-        RESULT_FILE="results/{key}={param}/out",
-        RESULT_TIME="results/{key}={param}/out.time",
+        RESULT_FILE="results/raw_data/{key}={param}/out",
+        RESULT_TIME="results/raw_data/{key}={param}/out.time",
     threads: config["NUM_THREADS"]
     log:
         "logs/raptor_search/{key}_{param}.log",
@@ -71,9 +71,9 @@ rule raptor_search:
 
 rule display_layout:
     input:
-        LAYOUT_FILE="results/{key}={param}/layout",
+        LAYOUT_FILE="results/raw_data/{key}={param}/layout",
     output:
-        SIZE_FILE="results/{key}={param}/out.sizes",
+        SIZE_FILE="results/raw_data/{key}={param}/out.sizes",
     threads: config["NUM_THREADS"]
     log:
         "logs/display_layout/{key}_{param}.log",

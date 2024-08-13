@@ -35,8 +35,8 @@ To test the workflow without running Raptor, data is provided in `.github/data`:
 
 ```bash
 # run from repository root directory
-mkdir --parents results
-tar xf .github/data/data.tar.zst --directory=results
+mkdir --parents results/raw_data
+tar xf .github/data/data.tar.zst --directory=results/raw_data
 export CI=true # Skips running raptor
 snakemake --use-conda --cores 2 --forceall
 ```
