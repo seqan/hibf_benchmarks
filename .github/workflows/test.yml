@@ -41,8 +41,8 @@ jobs:
 
       - name: Extract data
         run: |
-          mkdir -p ${{ github.workspace }}/results
-          tar xf ${{ github.workspace }}/.github/data/data.tar.zst -C ${{ github.workspace }}/results
+          mkdir -p ${{ github.workspace }}/results/raw_data
+          tar xf ${{ github.workspace }}/.github/data/data.tar.zst -C ${{ github.workspace }}/results/raw_data
 
       - name: Run snakemake
         run: snakemake --use-conda --conda-frontend mamba --cores $(nproc)
