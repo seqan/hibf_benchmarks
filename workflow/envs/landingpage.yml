@@ -3,3 +3,4 @@ channels:
   - conda-forge
 dependencies:
   - html2image=2.0.4.3
+  - beautifulsoup4=4.12.3
