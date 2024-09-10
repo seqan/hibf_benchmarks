@@ -3,39 +3,75 @@ Creates a landing page gallery with screenshots of Bokeh plot HTML files.
 """
 
 import os
-import re
-
+import json
+from bs4 import BeautifulSoup
 from bokeh_plot.components.log_init import log_init
 from html2image import Html2Image
 
-html_files = snakemake.input["PLOT_FILE"]
-output_file = snakemake.output["OUTPUT_FILE"]
-extra_file_plotting = snakemake.params["EXTRA_FILE_PLOTTING"]
-html_dir = snakemake.params["HTML_DIR"]
+html_files = snakemake.input["PLOT_FILE"] # type: ignore
+output_file = snakemake.output["OUTPUT_FILE"] # type: ignore
+extra_file_plotting = snakemake.params["EXTRA_FILE_PLOTTING"] # type: ignore
+html_dir = snakemake.params["HTML_DIR"] # type: ignore
 
-log_init(snakemake.log[0])
+log_init(snakemake.log[0]) # type: ignore
+
+# recursiv text extraction from json
+def find_texts(obj, texts):
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if key == 'text':
+                texts.append(value)
+            elif isinstance(value, (dict, list)):
+                find_texts(value, texts)
+    elif isinstance(obj, list):
+        for item in obj:
+            if isinstance(item, (dict, list)):
+                find_texts(item, texts)
+
+# extract dataset details from html file
+def extract_description(html_file):
+    with open(html_file, "r", encoding="utf-8") as f:
+        html = str(f.read())
+    soup = BeautifulSoup(html, 'html.parser')
+    extracted_script = soup.find("script", {"type": "application/json"})
+    converted_html = extracted_script.get_text().replace("&lt;", "<").replace("&gt;", ">").replace('\"', '"')
+    json_data = json.loads(converted_html)
+    texts = []
+    find_texts(json_data, texts)
+    text_string = "\n".join(texts)
+    converted_soup = BeautifulSoup(text_string, 'html.parser')
+    dataset = converted_soup.find("div", {"id": "dataset"})
+    print(dataset)
+    return dataset if dataset else html_file.split("/")[-1].replace(".html", "")
 
 # get html files
 if extra_file_plotting:
     html_files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith(".html")]
 
 # get html names
-html_names = [re.sub(".html", "", html_file) for html_file in html_files]
+html_names = [
+    html_file.split("/")[-1].replace(".html", "")
+    for html_file in html_files
+]
 
 # create png for each html
 hti = Html2Image(output_path=html_dir, custom_flags=["--headless", "--disable-gpu"])
 
 for html_file in html_files:
-    hti.screenshot(html_file=html_file, save_as=re.sub(".html", ".png", os.path.basename(html_file)))
+    hti.screenshot(html_file=html_file, save_as=os.path.basename(html_file).replace(".html", ".png"))
 
 # all parts of the landing page
 LIST_OF_PARTS = "\n".join(
     [
         f"""
         <div class="gallery-item">
-            <a href="{os.path.basename(html_name)}.html">
-                <img src="{os.path.basename(html_name)}.png" alt="Bokeh Plot {ihtml_name+1}">
-                Plot {ihtml_name+1}
+            <a href="{html_name}.html">
+                <img src="{html_name}.png" alt="Bokeh Plot {ihtml_name+1}">
+                <div class="description-box">
+                    <div class="description">
+                        {extract_description(f"results/html/{html_name}.html")}
+                    </div>
+                </div>
             </a>
         </div>
         """

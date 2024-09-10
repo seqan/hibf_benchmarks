@@ -33,13 +33,16 @@ legend_desc = {
 }
 
 dataset = {
-    "Type": "Simulated",
-    "Sequence size": "512 MiB",
-    "Number of bins": 1024,
-    "Number of haplotypes": 1,
-    "Number of reads": 1048576,
-    "Read length": 250,
-    "Read errors": 2,
+    "Description": "Simulated dataset with 1 haplotype and 1M reads",
+    "Parameters": {
+        "Type": "Simulated",
+        "Sequence size": "512 MiB",
+        "Number of bins": 1024,
+        "Number of haplotypes": 1,
+        "Number of reads": 1048576,
+        "Read length": 250,
+        "Read errors": 2,
+    }
 }
 
 
@@ -62,8 +65,8 @@ def create_latex_text():
 
 def create_dataset_text():
     """Creates a div containing the description of the plot."""
-    desc = '<div><h2>Dataset:</h2><div style="display: table; border-spacing: 2px;">'
-    for key, value in dataset.items():
+    desc = f'<div id="dataset" style="margin: 5px;"><h2 style="margin-bottom: 0;">Dataset:</h2><h4 style="margin-top: 0;"><strong>{dataset["Description"]}</strong></h4><div style="display: table; border-spacing: 2px;">'
+    for key, value in dataset["Parameters"].items():
         desc += f'<div style="display: table-row;"><div style="display: table-cell; text-align: right; font-weight: bold">{key}:</div><div style="display: table-cell; text-align: left;"> {value}</div></div>'
     desc += "</div></div>"
     return desc
