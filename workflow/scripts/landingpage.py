@@ -41,6 +41,9 @@ def extract_description(html_file):
     text_string = "\n".join(texts)
     converted_soup = BeautifulSoup(text_string, 'html.parser')
     dataset = converted_soup.find("div", {"id": "dataset"})
+    if dataset:
+        for headline in dataset.find_all("h2"):
+            headline.decompose()
     print(dataset)
     return dataset if dataset else html_file.split("/")[-1].replace(".html", "")
 
@@ -79,6 +82,7 @@ LIST_OF_PARTS = "\n".join(
     ]
 )
 
+
 # create landing page
 CSS_TEXT = """
     body {
@@ -101,7 +105,7 @@ CSS_TEXT = """
 
     .gallery {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
         gap: 20px;
         padding: 20px;
     }
@@ -111,6 +115,7 @@ CSS_TEXT = """
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         overflow: hidden;
+        position: relative;
         text-align: center;
         transform: scale(0.97);
         transition: 300ms ease-in-out;
@@ -125,7 +130,38 @@ CSS_TEXT = """
         max-width: 100%;
         height: auto;
         display: block;
-        margin-bottom: 10px;
+    }
+
+    .description-box {
+        position: absolute;
+        height: calc(100% - 20px);
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .gallery-item:hover .description-box {
+        transform: translateY(0);
+    }
+
+    .description {
+        max-height: 100%;
+        overflow: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .description::-webkit-scrollbar {
+        display: none;
     }
 
     .gallery-item a {
@@ -140,7 +176,13 @@ CSS_TEXT = """
     .gallery-item a:hover {
         color: #c2c2c2;
     }
+
+    .gallery-item h4 {
+        font-size: 1.3em;
+        margin-bottom: 5px;
+    }
     """
+
 
 HTML_TEXT = (
     """
