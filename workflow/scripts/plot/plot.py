@@ -8,7 +8,6 @@ from bokeh.plotting import curdoc, figure, output_file
 from bokeh.themes import Theme
 
 from components.convert_data import prepare_size_data, prepare_time_data
-from components.helpers import convert_dic_to_list
 from components.log_init import log_init
 from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot, save_tabs
 
@@ -74,8 +73,8 @@ def create_plot():
         time_x_range = round(max(time_dic["TOTAL_TIME"]) * 1.03, 3)
         size_x_range = round(max(size_dic["GB_TOTAL_SIZE"]) * 1.03, 3)
 
-        size_y_range = convert_dic_to_list(size_dic["SUBKEY"])
-        time_y_range = convert_dic_to_list(time_dic["SUBKEY"])
+        size_y_range = [str(i) for i in size_dic["SUBKEY"]]
+        time_y_range = [str(i) for i in time_dic["SUBKEY"]]
         y_range = size_y_range if len(size_y_range) > len(time_y_range) else time_y_range
 
         plot1 = create_time_plot(time_dic, y_range, time_x_range, key)

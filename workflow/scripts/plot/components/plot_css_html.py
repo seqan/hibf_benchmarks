@@ -166,3 +166,119 @@ def get_hover_code():
             size_plot_hovers[i].tooltips = size_description[i];
         }
         """
+
+
+def landing_page_css():
+    """ Returns the CSS style for the landing page."""
+    return"""
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #15191c;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .header {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 2em;
+        color: #ffffff;
+    }
+
+    .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .gallery-item {
+        height: 200px;
+        background-color: #000000;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        position: relative;
+        text-align: center;
+        display: flex;
+        transform: scale(0.97);
+        transition: 300ms ease-in-out;
+    }
+
+    .gallery-item:hover {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.134);
+        transform: scale(1);
+    }
+
+    .gallery-item img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .gallery-item h4 {
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+    }
+
+
+    .description-box {
+        position: absolute;
+        height: calc(100% - 20px);
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .gallery-item:hover .description-box {
+        transform: translateY(0);
+    }
+
+    .description {
+        max-height: 100%;
+        overflow: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .description::-webkit-scrollbar {
+        display: none;
+    }
+
+    .gallery-item a {
+        text-decoration: none;
+        color: #ffffff;
+        display: block;
+        padding: 10px;
+        font-size: 1em;
+        transition: 400ms ease-in-out;
+    }
+
+    .gallery-item a:hover {
+        color: #c2c2c2;
+    }
+
+    .gallery-item h4 {
+        font-size: 1.3em;
+        margin-bottom: 5px;
+        width: 100%;
+    }
+    """

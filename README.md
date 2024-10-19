@@ -8,7 +8,7 @@
 
 * General configuration: [config/config.yaml](config/config.yaml)
 * Plot configuration: [config/plot_config.yaml](config/plot_config.yaml)
-* Meta information: [workflow/scripts/bokeh_plot/components/plot_css_html.py](workflow/scripts/bokeh_plot/components/plot_css_html.py)
+* Meta information: [workflow/scripts/plot/components/plot_css_html.py](workflow/scripts/plot/components/plot_css_html.py)
 
 ### Setup
 

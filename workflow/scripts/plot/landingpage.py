@@ -5,8 +5,9 @@ Creates a landing page gallery with screenshots of Bokeh plot HTML files.
 import os
 import json
 from bs4 import BeautifulSoup
-from bokeh_plot.components.log_init import log_init
-from html2image import Html2Image
+from components.log_init import log_init
+from components.plot_css_html import landing_page_css
+
 
 html_files = snakemake.input["PLOT_FILE"] # type: ignore
 output_file = snakemake.output["OUTPUT_FILE"] # type: ignore
@@ -14,6 +15,7 @@ extra_file_plotting = snakemake.params["EXTRA_FILE_PLOTTING"] # type: ignore
 html_dir = snakemake.params["HTML_DIR"] # type: ignore
 
 log_init(snakemake.log[0]) # type: ignore
+
 
 # recursiv text extraction from json
 def find_texts(obj, texts):
@@ -28,8 +30,9 @@ def find_texts(obj, texts):
             if isinstance(item, (dict, list)):
                 find_texts(item, texts)
 
-# extract dataset details from html file
-def extract_description(html_file):
+
+# prepare html for extraction
+def clean_html(html_file):
     with open(html_file, "r", encoding="utf-8") as f:
         html = str(f.read())
     soup = BeautifulSoup(html, 'html.parser')
@@ -41,15 +44,35 @@ def extract_description(html_file):
     text_string = "\n".join(texts)
     converted_soup = BeautifulSoup(text_string, 'html.parser')
     dataset = converted_soup.find("div", {"id": "dataset"})
-    if dataset:
-        for headline in dataset.find_all("h2"):
+    return dataset
+
+
+# extract dataset details from html file
+def extract_description(html_file):
+    cleaned_html = clean_html(html_file)
+    if cleaned_html:
+        for headline in cleaned_html.find_all("h2"):
             headline.decompose()
-    print(dataset)
-    return dataset if dataset else html_file.split("/")[-1].replace(".html", "")
+        for headline in cleaned_html.find_all("h4"):
+            headline.decompose()
+    filename = html_file.split("/")[-1].replace(".html", "")
+    return cleaned_html if cleaned_html else filename
+
+
+# extract headline from html file
+def extract_headline(html_file):
+    cleaned_html = clean_html(html_file)
+    if cleaned_html:
+        for headline in cleaned_html.find_all("h4"):
+            return headline.get_text() if headline else html_file
+    filename = html_file.split("/")[-1].replace(".html", "")
+    return filename
+
 
 # get html files
 if extra_file_plotting:
     html_files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith(".html")]
+
 
 # get html names
 html_names = [
@@ -57,19 +80,14 @@ html_names = [
     for html_file in html_files
 ]
 
-# create png for each html
-hti = Html2Image(output_path=html_dir, custom_flags=["--headless", "--disable-gpu"])
-
-for html_file in html_files:
-    hti.screenshot(html_file=html_file, save_as=os.path.basename(html_file).replace(".html", ".png"))
 
 # all parts of the landing page
 LIST_OF_PARTS = "\n".join(
     [
         f"""
         <div class="gallery-item">
+            <h4>{extract_headline(f"results/html/{html_name}.html")}</h4>
             <a href="{html_name}.html">
-                <img src="{html_name}.png" alt="Bokeh Plot {ihtml_name+1}">
                 <div class="description-box">
                     <div class="description">
                         {extract_description(f"results/html/{html_name}.html")}
@@ -78,110 +96,9 @@ LIST_OF_PARTS = "\n".join(
             </a>
         </div>
         """
-        for (ihtml_name, html_name) in enumerate(html_names)
+        for html_name in html_names
     ]
 )
-
-
-# create landing page
-CSS_TEXT = """
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #15191c;
-        margin: 0;
-        padding: 20px;
-    }
-
-    .header {
-        text-align: center;
-        padding: 20px;
-    }
-
-    .header h1 {
-        margin: 0;
-        font-size: 2em;
-        color: #ffffff;
-    }
-
-    .gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 20px;
-        padding: 20px;
-    }
-
-    .gallery-item {
-        background-color: #000000;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        overflow: hidden;
-        position: relative;
-        text-align: center;
-        transform: scale(0.97);
-        transition: 300ms ease-in-out;
-    }
-
-    .gallery-item:hover {
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.134);
-        transform: scale(1);
-    }
-
-    .gallery-item img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .description-box {
-        position: absolute;
-        height: calc(100% - 20px);
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px;
-        transform: translateY(100%);
-        transition: transform 0.3s ease-in-out;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .gallery-item:hover .description-box {
-        transform: translateY(0);
-    }
-
-    .description {
-        max-height: 100%;
-        overflow: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .description::-webkit-scrollbar {
-        display: none;
-    }
-
-    .gallery-item a {
-        text-decoration: none;
-        color: #ffffff;
-        display: block;
-        padding: 10px;
-        font-size: 1em;
-        transition: 400ms ease-in-out;
-    }
-
-    .gallery-item a:hover {
-        color: #c2c2c2;
-    }
-
-    .gallery-item h4 {
-        font-size: 1.3em;
-        margin-bottom: 5px;
-    }
-    """
 
 
 HTML_TEXT = (
@@ -210,9 +127,10 @@ HTML_TEXT = (
     """
 )
 
+
 # save landing page
 with open(os.path.join(os.path.dirname(output_file), "style.css"), "w", encoding="utf-8") as f:
-    f.write(CSS_TEXT)
+    f.write(landing_page_css())
 
 with open(output_file, "w", encoding="utf-8") as f:
     f.write(HTML_TEXT)
