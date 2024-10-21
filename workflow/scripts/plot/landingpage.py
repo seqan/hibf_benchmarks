@@ -2,26 +2,27 @@
 Creates a landing page gallery with screenshots of Bokeh plot HTML files.
 """
 
-import os
 import json
+import os
+
 from bs4 import BeautifulSoup
+
 from components.log_init import log_init
 from components.plot_css_html import landing_page_css
 
+html_files = snakemake.input["PLOT_FILE"]  # type: ignore
+output_file = snakemake.output["OUTPUT_FILE"]  # type: ignore
+extra_file_plotting = snakemake.params["EXTRA_FILE_PLOTTING"]  # type: ignore
+html_dir = snakemake.params["HTML_DIR"]  # type: ignore
 
-html_files = snakemake.input["PLOT_FILE"] # type: ignore
-output_file = snakemake.output["OUTPUT_FILE"] # type: ignore
-extra_file_plotting = snakemake.params["EXTRA_FILE_PLOTTING"] # type: ignore
-html_dir = snakemake.params["HTML_DIR"] # type: ignore
-
-log_init(snakemake.log[0]) # type: ignore
+log_init(snakemake.log[0])  # type: ignore
 
 
 def find_texts(obj, texts):
     """ recursiv text extraction from json """
     if isinstance(obj, dict):
         for key, value in obj.items():
-            if key == 'text':
+            if key == "text":
                 texts.append(value)
             elif isinstance(value, (dict, list)):
                 find_texts(value, texts)
@@ -40,14 +41,14 @@ def clean_html(html_file):
     """ prepare html for extraction"""
     with open(html_file, "r", encoding="utf-8") as f:
         html = str(f.read())
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, "html.parser")
     extracted_script = soup.find("script", {"type": "application/json"})
-    converted_html = extracted_script.get_text().replace("&lt;", "<").replace("&gt;", ">").replace('\"', '"')
+    converted_html = extracted_script.get_text().replace("&lt;", "<").replace("&gt;", ">").replace('"', '"')
     json_data = json.loads(converted_html)
     texts = []
     find_texts(json_data, texts)
     text_string = "\n".join(texts)
-    converted_soup = BeautifulSoup(text_string, 'html.parser')
+    converted_soup = BeautifulSoup(text_string, "html.parser")
     dataset = converted_soup.find("div", {"id": "dataset"})
     return dataset
 
