@@ -19,7 +19,7 @@ log_init(snakemake.log[0])  # type: ignore
 
 
 def find_texts(obj, texts):
-    """ recursiv text extraction from json """
+    """recursiv text extraction from json"""
     if isinstance(obj, dict):
         for key, value in obj.items():
             if key == "text":
@@ -33,12 +33,12 @@ def find_texts(obj, texts):
 
 
 def get_html_name(html_file):
-    """ get the html name from the html file"""
+    """get the html name from the html file"""
     return html_file.split("/")[-1].replace(".html", "")
 
 
 def clean_html(html_file):
-    """ prepare html for extraction"""
+    """prepare html for extraction"""
     with open(html_file, "r", encoding="utf-8") as f:
         html = str(f.read())
     soup = BeautifulSoup(html, "html.parser")
@@ -54,7 +54,7 @@ def clean_html(html_file):
 
 
 def extract_description(html_file):
-    """ extract dataset details from html file """
+    """extract dataset details from html file"""
     cleaned_html = clean_html(html_file)
     if cleaned_html:
         for headline in cleaned_html.find_all("h2") + cleaned_html.find_all("h4"):
@@ -64,7 +64,7 @@ def extract_description(html_file):
 
 
 def extract_headline(html_file):
-    """ extract headline from html file"""
+    """extract headline from html file"""
     cleaned_html = clean_html(html_file)
     if cleaned_html:
         for headline in cleaned_html.find_all("h4"):
@@ -74,7 +74,7 @@ def extract_headline(html_file):
 
 
 if extra_file_plotting:
-    """ get html files"""
+    """get html files"""
     html_files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith(".html")]
 
 
