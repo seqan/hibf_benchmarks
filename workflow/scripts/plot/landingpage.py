@@ -39,8 +39,8 @@ def get_html_name(html_file):
 
 def clean_html(html_file):
     """prepare html for extraction"""
-    with open(html_file, "r", encoding="utf-8") as f:
-        html = str(f.read())
+    with open(html_file, "r", encoding="utf-8") as file:
+        html = str(file.read())
     soup = BeautifulSoup(html, "html.parser")
     extracted_script = soup.find("script", {"type": "application/json"})
     converted_html = extracted_script.get_text().replace("&lt;", "<").replace("&gt;", ">").replace('"', '"')
@@ -73,8 +73,8 @@ def extract_headline(html_file):
     return filename
 
 
+# if extra_file_plotting is True, get all html files from the results/html directory
 if extra_file_plotting:
-    """get html files"""
     html_files = [os.path.join(html_dir, f) for f in os.listdir(html_dir) if f.endswith(".html")]
 
 
