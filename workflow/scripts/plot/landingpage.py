@@ -31,6 +31,11 @@ def find_texts(obj, texts):
                 find_texts(item, texts)
 
 
+# get the html name from the html file
+def get_html_name(html_file):
+    return html_file.split("/")[-1].replace(".html", "")
+
+
 # prepare html for extraction
 def clean_html(html_file):
     with open(html_file, "r", encoding="utf-8") as f:
@@ -51,11 +56,9 @@ def clean_html(html_file):
 def extract_description(html_file):
     cleaned_html = clean_html(html_file)
     if cleaned_html:
-        for headline in cleaned_html.find_all("h2"):
+        for headline in cleaned_html.find_all("h2") + cleaned_html.find_all("h4"):
             headline.decompose()
-        for headline in cleaned_html.find_all("h4"):
-            headline.decompose()
-    filename = html_file.split("/")[-1].replace(".html", "")
+    filename = get_html_name(html_file)
     return cleaned_html if cleaned_html else filename
 
 
@@ -65,7 +68,7 @@ def extract_headline(html_file):
     if cleaned_html:
         for headline in cleaned_html.find_all("h4"):
             return headline.get_text() if headline else html_file
-    filename = html_file.split("/")[-1].replace(".html", "")
+    filename = get_html_name(html_file)
     return filename
 
 
@@ -75,13 +78,11 @@ if extra_file_plotting:
 
 
 # get html names
-html_names = [
-    html_file.split("/")[-1].replace(".html", "")
-    for html_file in html_files
-]
+html_names = [get_html_name(html_file) for html_file in html_files]
 
 
-# all parts of the landing page
+# all gallery items for the landing page, headline of the data-description will become the title of the gallery-item,
+# the description of the data-set will become the hover box
 LIST_OF_PARTS = "\n".join(
     [
         f"""
@@ -101,6 +102,7 @@ LIST_OF_PARTS = "\n".join(
 )
 
 
+# html template
 HTML_TEXT = (
     """
     <!DOCTYPE html>
@@ -128,7 +130,7 @@ HTML_TEXT = (
 )
 
 
-# save landing page
+# save landing page and css
 with open(os.path.join(os.path.dirname(output_file), "style.css"), "w", encoding="utf-8") as f:
     f.write(landing_page_css())
 

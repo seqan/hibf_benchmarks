@@ -11,17 +11,17 @@ from components.convert_data import prepare_size_data, prepare_time_data
 from components.log_init import log_init
 from components.plot_style import add_legend, add_second_y_axis, configure_size_plot, configure_time_plot, save_tabs
 
-log_init(snakemake.log[0])
+log_init(snakemake.log[0]) # type: ignore
 
-SIZE_INPUT = snakemake.input["SIZE_INPUT"]
-TIME_INPUT = snakemake.input["TIME_INPUT"]
+SIZE_INPUT = snakemake.input["SIZE_INPUT"] # type: ignore
+TIME_INPUT = snakemake.input["TIME_INPUT"] # type: ignore
 
-PLOT_FILE = snakemake.output["PLOT_FILE"]
+PLOT_FILE = snakemake.output["PLOT_FILE"] # type: ignore
 
-THEME = snakemake.params["THEME"]
-KEYS = snakemake.params["KEYS"]
-TIME = snakemake.params["TIME"]
-SIZE = snakemake.params["SIZE"]
+THEME = snakemake.params["THEME"] # type: ignore
+KEYS = snakemake.params["KEYS"] # type: ignore
+TIME = snakemake.params["TIME"] # type: ignore
+SIZE = snakemake.params["SIZE"] # type: ignore
 
 TIME_NAMES = [TIME["NAMES"].get(key, key) for key in TIME["FORMAT"]]
 SIZE_NAMES = [SIZE["NAMES"].get(key, key) for key in SIZE["FORMAT"]]
