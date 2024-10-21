@@ -42,7 +42,7 @@ dataset = {
         "Number of reads": 1048576,
         "Read length": 250,
         "Read errors": 2,
-    }
+    },
 }
 
 
@@ -169,8 +169,8 @@ def get_hover_code():
 
 
 def landing_page_css():
-    """ Returns the CSS style for the landing page."""
-    return"""
+    """Returns the CSS style for the landing page."""
+    return """
     body {
         font-family: Arial, sans-serif;
         background-color: #15191c;
