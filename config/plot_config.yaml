@@ -1,7 +1,8 @@
-PLOT_NAME: "plot1"
-EXTRA_FILE_PLOTTING: True
+PLOT_NAME: "plot_name"
+EXTRA_FILE_PLOTTING: True # if True, ALL htmls in the results/html folder will be plotted
 
 
+# Names for the different keys in the plot
 KEYS:
   alpha: alpha
   hash: hash
@@ -12,6 +13,8 @@ KEYS:
   U+R: U+R
 
 
+# Format: all benchmark-times to plot
+# Names: names for the different keys in the plot
 TIME:
   FORMAT:
     - determine_query_length_in_seconds
@@ -42,6 +45,8 @@ TIME:
     generate_results_max_percentage: "Generate results (max) percentage"
 
 
+# Format: all benchmark-sizes to plot
+# Names: names for the different keys in the plot
 SIZE:
   FORMAT:
     - LEVEL_0_GB_SIZE

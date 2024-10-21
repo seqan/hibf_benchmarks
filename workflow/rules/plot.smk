@@ -5,7 +5,7 @@ rule plot_data:
     output:
         PLOT_FILE=f"results/html/{config['PLOT_NAME']}.html",
     params:
-        THEME="workflow/scripts/bokeh_plot/plot_theme.yaml",
+        THEME="workflow/scripts/plot/plot_theme.yaml",
         KEYS=config["KEYS"],
         TIME=config["TIME"],
         SIZE=config["SIZE"],
@@ -14,7 +14,7 @@ rule plot_data:
     conda:
         "../envs/bokeh.yml"
     script:
-        "../scripts/bokeh_plot/plot.py"
+        "../scripts/plot/plot.py"
 
 
 rule plot_landingpage:
@@ -22,7 +22,6 @@ rule plot_landingpage:
         PLOT_FILE=f"results/html/{config['PLOT_NAME']}.html",
     output:
         OUTPUT_FILE="results/html/index.html",
-        PNG_FILE=f"results/html/{config['PLOT_NAME']}.png",
     params:
         EXTRA_FILE_PLOTTING=config["EXTRA_FILE_PLOTTING"],
         HTML_DIR="results/html",
@@ -31,4 +30,4 @@ rule plot_landingpage:
     conda:
         "../envs/landingpage.yml"
     script:
-        "../scripts/landingpage.py"
+        "../scripts/plot/landingpage.py"
