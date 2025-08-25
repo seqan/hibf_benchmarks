@@ -2,4 +2,4 @@ name: snakemake
 channels:
   - conda-forge
 dependencies:
-  - bioconda::snakemake=8.10.7
+  - bioconda::snakemake=9.9.0
