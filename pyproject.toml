@@ -22,6 +22,7 @@ disable = ["line-too-long", "import-error", "fixme"]
 max-locals = 50
 max-statements = 150
 max-args = 7
+max-positional-arguments = 7
 
 [tool.pylint.variables]
 additional-builtins = ["snakemake"]

@@ -2,4 +2,4 @@ name: bokeh
 channels:
   - conda-forge
 dependencies:
-  - bokeh=3.4.1
+  - bokeh=3.7.3

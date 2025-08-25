@@ -24,6 +24,8 @@ html_names = [re.sub(".html", "", html_file) for html_file in html_files]
 
 # create png for each html
 hti = Html2Image(output_path=html_dir, custom_flags=["--headless", "--disable-gpu"])
+if os.getenv("CI", "false") == "true":
+    hti.browser.flags += ["--no-sandbox"]
 
 for html_file in html_files:
     hti.screenshot(html_file=html_file, save_as=re.sub(".html", ".png", os.path.basename(html_file)))

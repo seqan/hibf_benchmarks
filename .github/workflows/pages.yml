@@ -45,7 +45,7 @@ jobs:
           tar xf ${{ github.workspace }}/.github/data/data.tar.zst -C ${{ github.workspace }}/results/raw_data
 
       - name: Run snakemake
-        run: snakemake --use-conda --conda-frontend mamba --cores $(nproc)
+        run: snakemake --use-conda --cores $(nproc)
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
