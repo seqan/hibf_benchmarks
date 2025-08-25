@@ -48,7 +48,7 @@ jobs:
         run: snakemake --use-conda --cores $(nproc)
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: './results/html'
 
