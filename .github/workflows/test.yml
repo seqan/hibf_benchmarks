@@ -23,7 +23,7 @@ jobs:
     steps:
       # pull_request_target does not checkout the merge commit by default
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
