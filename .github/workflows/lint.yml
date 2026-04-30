@@ -28,7 +28,7 @@ jobs:
           token: ${{ secrets.SEQAN_ACTIONS_PAT }}
 
       - name: Setup conda
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           activate-environment: lint
           auto-activate-base: false

@@ -28,7 +28,7 @@ jobs:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Setup conda
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           activate-environment: snakemake
           auto-activate-base: false
