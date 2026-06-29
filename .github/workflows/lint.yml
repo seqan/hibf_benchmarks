@@ -26,6 +26,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.SEQAN_ACTIONS_PAT }}
+          allow-unsafe-pr-checkout: true
 
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v4
